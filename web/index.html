@@ -27,6 +27,25 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAXONHuBV3rgrz8HgtjDaciGglmdbWsZxI",
+      authDomain: "flutter-restaurant-15512.firebaseapp.com",
+      projectId: "flutter-restaurant-15512",
+      storageBucket: "flutter-restaurant-15512.appspot.com",
+      messagingSenderId: "1028421970472",
+      appId: "1:1028421970472:web:25e7a2a2918570aadf231d",
+      measurementId: "G-552YP0NCWE"
+    };
+  
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
