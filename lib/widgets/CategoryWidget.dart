@@ -55,7 +55,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
+          padding: const EdgeInsets.only(left: 10, top: 10, bottom: 5),
           child: Text('หมวดหมู่สินค้า'),
         ),
         Expanded(
