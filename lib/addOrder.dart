@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_restaurant/theme.dart';
@@ -13,6 +15,26 @@ class AddOrderPage extends StatefulWidget {
 }
 
 class _AddOrderPageState extends State<AddOrderPage> {
+  int qty = 1;
+  List types = [];
+  List options = [];
+  String selectedType = "";
+  Map? selectedOption;
+  String selectedOptionName = "";
+
+  initData() {
+    setState(() {
+      types = widget.product['types'];
+      options = widget.product['options'];
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,32 +65,39 @@ class _AddOrderPageState extends State<AddOrderPage> {
           ),
           Center(child: Text('รายละเอียด / รูปแบบ')),
           Column(
-            children: [
-              ListTile(
-                title: Text('สูตรธรรมดา'),
-                leading: Icon(Icons.check_box_outline_blank_outlined),
-              ),
-              ListTile(
-                title: Text('สูตรพิเศษ'),
-                leading: Icon(Icons.check_box_outline_blank_outlined),
-              ),
-            ],
+            children: types.map((item) {
+              return ListTile(
+                onTap: () {
+                  setState(() {
+                    selectedType = item;
+                  });
+                },
+                title: Text(item),
+                leading: selectedType == item
+                    ? Icon(Icons.check_box, color: Colors.green)
+                    : Icon(Icons.check_box_outline_blank_outlined,
+                        color: Colors.grey),
+              );
+            }).toList(),
           ),
           Center(child: Text('ตัวเลือก')),
           Column(
-            children: [
-              ListTile(
-                title: Text('ไข่ดาว'),
-                trailing: Text('10 บาท'),
-                leading: Icon(Icons.check_box_outline_blank_outlined),
-              ),
-              ListTile(
-                title: Text('ไส้กรอก'),
-                trailing: Text('10 บาท'),
-                leading: Icon(Icons.check_box_outline_blank_outlined),
-              ),
-            ],
-          )
+              children: options.map((item) {
+            return ListTile(
+              onTap: () {
+                setState(() {
+                  selectedOption = item;
+                  selectedOptionName = item['name'];
+                });
+              },
+              title: Text("${item['name']}"),
+              trailing: Text("${item['price']}"),
+              leading: selectedOptionName == item['name']
+                  ? Icon(Icons.check_box, color: Colors.green)
+                  : Icon(Icons.check_box_outline_blank_outlined,
+                      color: Colors.grey),
+            );
+          }).toList())
         ],
       ),
       bottomNavigationBar: BottomAppBar(
@@ -85,7 +114,13 @@ class _AddOrderPageState extends State<AddOrderPage> {
                       color: ThemeColors.kAccentColor,
                       size: 25,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        if (qty != 1) {
+                          qty--;
+                        }
+                      });
+                    },
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -93,7 +128,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                         borderRadius: BorderRadius.circular(5)),
                     padding: EdgeInsets.only(left: 10, right: 10),
                     child: Text(
-                      '2',
+                      '$qty',
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -106,46 +141,53 @@ class _AddOrderPageState extends State<AddOrderPage> {
                       color: ThemeColors.kPrimaryColor,
                       size: 25,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        qty++;
+                      });
+                    },
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton.icon(
-                    style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: ThemeColors.kAccentColor,
-                      minimumSize: Size(150, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          bottomLeft: Radius.circular(20),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        primary: Colors.white,
+                        backgroundColor: ThemeColors.kAccentColor,
+                        minimumSize: Size(130, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomLeft: Radius.circular(20),
+                          ),
                         ),
                       ),
+                      icon: Icon(Icons.cancel),
+                      label: Text('ยกเลิก'),
+                      onPressed: () {},
                     ),
-                    icon: Icon(Icons.cancel),
-                    label: Text('ยกเลิก'),
-                    onPressed: () {},
-                  ),
-                  TextButton.icon(
-                    style: TextButton.styleFrom(
-                      primary: Colors.white,
-                      backgroundColor: ThemeColors.kPrimaryColor,
-                      minimumSize: Size(150, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        primary: Colors.white,
+                        backgroundColor: ThemeColors.kPrimaryColor,
+                        minimumSize: Size(130, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          ),
                         ),
                       ),
-                    ),
-                    icon: Icon(Icons.check),
-                    label: Text('ยืนยัน'),
-                    onPressed: () {},
-                  )
-                ],
+                      icon: Icon(Icons.check),
+                      label: Text('ยืนยัน'),
+                      onPressed: () {},
+                    )
+                  ],
+                ),
               ),
             ],
           ),
