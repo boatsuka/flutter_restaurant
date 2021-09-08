@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_restaurant/addOrder.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 import 'package:flutter_restaurant/widgets/ProductItemBox.dart';
 
@@ -46,10 +47,19 @@ class _ProductListWidgetState extends State<ProductListWidget> {
             children: widget.products.map((DocumentSnapshot product) {
               return Column(
                 children: [
-                  ProductItemBox(
-                    imageUrl: '${product['imageUrl']}',
-                    width: 150,
-                    height: 100,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AddOrderPage(
+                          product: product,
+                        ),
+                      ));
+                    },
+                    child: ProductItemBox(
+                      imageUrl: '${product['imageUrl']}',
+                      width: 150,
+                      height: 100,
+                    ),
                   ),
                   SizedBox(
                     height: 10,
