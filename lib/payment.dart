@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class PaymentPage extends StatefulWidget {
-  const PaymentPage({ Key? key }) : super(key: key);
 
   @override
   _PaymentPageState createState() => _PaymentPageState();

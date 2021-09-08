@@ -1,14 +1,13 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/theme.dart';
 import 'package:flutter_restaurant/widgets/ProductItemBox.dart';
 
 class AddOrderPage extends StatefulWidget {
   final DocumentSnapshot product;
 
-  const AddOrderPage({Key? key, required this.product}) : super(key: key);
+  const AddOrderPage({@required this.product});
 
   @override
   _AddOrderPageState createState() => _AddOrderPageState();
@@ -18,9 +17,38 @@ class _AddOrderPageState extends State<AddOrderPage> {
   int qty = 1;
   List types = [];
   List options = [];
-  String selectedType = "";
-  Map? selectedOption;
-  String selectedOptionName = "";
+  String selectedType;
+  Map selectedOption;
+  String selectedOptionName;
+
+  final dbRef = FirebaseFirestore.instance;
+  Helper helper = Helper();
+
+  Future saveOrder() async {
+    String tableId = await helper.getStorage('tableId');
+    String tableName = await helper.getStorage('tableName');
+    String orderId = await helper.getStorage('orderId');
+
+    await dbRef
+        .collection('restaurantDB')
+        .doc('s1KEI8hv3vt9UveKERtJ')
+        .collection('order-items')
+        .add({
+      "itemStatus": "PREPARED",
+      "options": selectedOption,
+      "orderDate": new DateTime.now().millisecondsSinceEpoch,
+      "orderId": orderId,
+      "price": widget.product['price'],
+      "productId": widget.product.id,
+      "productName": widget.product['productName'],
+      "qty": qty,
+      "tableId": tableId,
+      "tableName": tableName,
+      "type": selectedType,
+    });
+
+    Navigator.of(context).pop();
+  }
 
   initData() {
     setState(() {
@@ -168,12 +196,14 @@ class _AddOrderPageState extends State<AddOrderPage> {
                       ),
                       icon: Icon(Icons.cancel),
                       label: Text('ยกเลิก'),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                    TextButton.icon(
-                      style: TextButton.styleFrom(
-                        primary: Colors.white,
-                        backgroundColor: ThemeColors.kPrimaryColor,
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        primary: ThemeColors.kPrimaryColor,
+                        onPrimary: Colors.white,
                         minimumSize: Size(130, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
@@ -184,7 +214,12 @@ class _AddOrderPageState extends State<AddOrderPage> {
                       ),
                       icon: Icon(Icons.check),
                       label: Text('ยืนยัน'),
-                      onPressed: () {},
+                      onPressed:
+                          selectedType != null && selectedOptionName != null
+                              ? () {
+                                  saveOrder();
+                                }
+                              : null,
                     )
                   ],
                 ),

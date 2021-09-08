@@ -5,8 +5,6 @@ import 'package:flutter_restaurant/widgets/ProductListWidget.dart';
 import 'package:flutter_restaurant/widgets/PromotionWidget.dart';
 
 class ProductPage extends StatefulWidget {
-  const ProductPage({Key? key}) : super(key: key);
-
   @override
   _ProductPageState createState() => _ProductPageState();
 }

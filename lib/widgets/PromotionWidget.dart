@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_restaurant/widgets/ProductItemBox.dart';
 
 class PromotionWidget extends StatefulWidget {
-  const PromotionWidget({Key? key}) : super(key: key);
 
   @override
   _PromotionWidgetState createState() => _PromotionWidgetState();

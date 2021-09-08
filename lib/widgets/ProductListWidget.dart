@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_restaurant/addOrder.dart';
+import 'package:flutter_restaurant/helper.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 import 'package:flutter_restaurant/widgets/ProductItemBox.dart';
 
@@ -8,15 +9,16 @@ class ProductListWidget extends StatefulWidget {
   final List<DocumentSnapshot> products;
 
   const ProductListWidget({
-    Key? key,
-    required this.products,
-  }) : super(key: key);
+    @required this.products,
+  });
 
   @override
   _ProductListWidgetState createState() => _ProductListWidgetState();
 }
 
 class _ProductListWidgetState extends State<ProductListWidget> {
+  Helper helper = Helper();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -48,12 +50,16 @@ class _ProductListWidgetState extends State<ProductListWidget> {
               return Column(
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => AddOrderPage(
-                          product: product,
-                        ),
-                      ));
+                    onTap: () async {
+                      String orderId = await helper.getStorage('orderId');
+                      if (orderId != null) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AddOrderPage(product: product),
+                          ),
+                        );
+                      }
                     },
                     child: ProductItemBox(
                       imageUrl: '${product['imageUrl']}',

@@ -6,9 +6,8 @@ class CategoryWidget extends StatefulWidget {
   final Function(DocumentSnapshot) onChange;
 
   const CategoryWidget({
-    Key? key,
-    required this.onChange,
-  }) : super(key: key);
+    @required this.onChange,
+  });
 
   @override
   _CategoryWidgetState createState() => _CategoryWidgetState();
@@ -18,7 +17,7 @@ class _CategoryWidgetState extends State<CategoryWidget> {
   final dbRef = FirebaseFirestore.instance;
 
   bool isloading = false;
-  DocumentReference? selectedCategory;
+  DocumentReference selectedCategory;
   List<DocumentSnapshot> categories = [];
 
   Future getCategories() async {

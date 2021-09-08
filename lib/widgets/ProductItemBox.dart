@@ -7,11 +7,10 @@ class ProductItemBox extends StatelessWidget {
   final double height;
 
   const ProductItemBox({
-    Key? key,
-    required this.imageUrl,
-    required this.width,
-    required this.height,
-  }) : super(key: key);
+    @required this.imageUrl,
+    @required this.width,
+    @required this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
