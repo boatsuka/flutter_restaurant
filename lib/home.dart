@@ -31,7 +31,6 @@ class _HomePageState extends State<HomePage> {
       "tableId": "kGlMyXn4xIfPZSDJV5dh",
       "orderDate": new DateTime.now().millisecondsSinceEpoch
     });
-    print(ref.id);
 
     await helper.setStorage('tableId', 'kGlMyXn4xIfPZSDJV5dh');
     await helper.setStorage('tableName', 'โต๊ะ 1');
