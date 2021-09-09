@@ -67,6 +67,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: ThemeColors.kPrimaryColor,
         title: Text('สั่งอาหาร'),
       ),
       body: ListView(
