@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/helper.dart';
+import 'package:flutter_restaurant/login.dart';
 import 'package:flutter_restaurant/theme.dart';
 import 'package:flutter_restaurant/chat.dart';
 import 'package:flutter_restaurant/order.dart';
@@ -64,7 +65,10 @@ class _HomePageState extends State<HomePage> {
               Icons.home,
               color: ThemeColors.kPrimaryColor,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => LoginPage()));
+            },
           ),
         ],
         backgroundColor: Colors.white,
