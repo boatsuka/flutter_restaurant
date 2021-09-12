@@ -16,6 +16,7 @@ class _OrderPageState extends State<OrderPage> {
 
   Future getOrderId() async {
     String _orderId = await helper.getStorage('orderId');
+
     setState(() {
       orderId = _orderId;
     });
@@ -43,25 +44,38 @@ class _OrderPageState extends State<OrderPage> {
           Text('รายการอาหารที่สั่ง'),
           Divider(),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-                stream: dbRef
-                    .collection('restaurantDB')
-                    .doc('s1KEI8hv3vt9UveKERtJ')
-                    .collection('order-items')
-                    .where('orderId', isEqualTo: orderId)
-                    .orderBy('orderDate', descending: false)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) return const Text('Loading...');
-                  return ListView.builder(
-                      itemCount: snapshot.data.size,
-                      itemBuilder: (context, int index) {
-                        return OrderItemWidget(
-                          document: snapshot.data.docs[index],
-                        );
-                      });
-                }),
-          )
+              child: orderId != null
+                  ? StreamBuilder<QuerySnapshot>(
+                      stream: dbRef
+                          .collection('restaurantDB')
+                          .doc('s1KEI8hv3vt9UveKERtJ')
+                          .collection('order-items')
+                          .where('orderId', isEqualTo: orderId)
+                          .orderBy('orderDate', descending: false)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          print('snapshot.error');
+                          return Text('${snapshot.error}');
+                        }
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                            return Text('Loading...');
+                          default:
+                            return snapshot.hasData
+                                ? ListView(
+                                    children: snapshot.data.docs.map((e) {
+                                      return OrderItemWidget(document: e);
+                                    }).toList(),
+                                  )
+                                : Center(child: Text('ไม่พบรายการ'));
+                        }
+                      })
+                  : Container(
+                      child: Center(
+                        child: Text('ไม่พบรายการ'),
+                      ),
+                    ))
         ],
       ),
       bottomNavigationBar: BottomAppBar(

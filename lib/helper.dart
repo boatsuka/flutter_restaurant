@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Helper {
@@ -13,5 +14,11 @@ class Helper {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     return prefs.getString(key);
+  }
+
+  String timestampToTime(DateTime date) {
+    var strDate = new DateFormat.Hm().format(date);
+
+    return strDate;
   }
 }
