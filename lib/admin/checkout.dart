@@ -89,6 +89,7 @@ class _AdminCheckoutPageState extends State<AdminCheckoutPage> {
       appBar: AppBar(
         title: Text('รายการอาหารที่สั่ง'),
         elevation: 0,
+        backgroundColor: ThemeColors.kPrimaryColor,
       ),
       body: Column(
         children: [

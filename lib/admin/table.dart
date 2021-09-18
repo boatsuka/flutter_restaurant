@@ -5,7 +5,6 @@ import 'package:flutter_restaurant/admin/checkout.dart';
 import 'package:flutter_restaurant/admin/orderItem.dart';
 import 'package:flutter_restaurant/showQRCode.dart';
 import 'package:flutter_restaurant/theme.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 class AdminTablePage extends StatefulWidget {

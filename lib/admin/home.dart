@@ -66,6 +66,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             onPressed: () => logout(),
           )
         ],
+        backgroundColor: ThemeColors.kPrimaryColor,
       ),
       drawer: Drawer(
         child: ListView(
