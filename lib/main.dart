@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/home.dart';
 import 'package:flutter_restaurant/theme.dart';
+import 'package:flutter_restaurant/FluroRoutes.dart';
 
 void main() {
+  FloruRoutes.defineRoutes();
   runApp(MyApp());
 }
 
@@ -18,6 +20,8 @@ class MyApp extends StatelessWidget {
         accentColor: ThemeColors.kAccentColor,
       ),
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      onGenerateRoute: FloruRoutes.router.generator,
     );
   }
 }

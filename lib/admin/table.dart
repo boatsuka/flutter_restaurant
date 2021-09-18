@@ -1,6 +1,11 @@
+import 'dart:html';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_restaurant/admin/checkout.dart';
+import 'package:flutter_restaurant/admin/orderItem.dart';
+import 'package:flutter_restaurant/showQRCode.dart';
 import 'package:flutter_restaurant/theme.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:responsive_grid/responsive_grid.dart';
 
 class AdminTablePage extends StatefulWidget {
@@ -9,7 +14,17 @@ class AdminTablePage extends StatefulWidget {
 }
 
 class _AdminTablePageState extends State<AdminTablePage> {
+  String webUrl;
   final dbRef = FirebaseFirestore.instance;
+
+  void getCurrentUrl() {
+    String url = window.location.href;
+    String xurl = url.split('#')[0];
+
+    setState(() {
+      webUrl = xurl;
+    });
+  }
 
   Future createOrder(DocumentSnapshot document) async {
     DocumentReference ref = await dbRef
@@ -57,7 +72,9 @@ class _AdminTablePageState extends State<AdminTablePage> {
                         topLeft: Radius.circular(20),
                         bottomLeft: Radius.circular(20),
                       ))),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
                 ElevatedButton.icon(
                   icon: Icon(Icons.check),
@@ -79,6 +96,90 @@ class _AdminTablePageState extends State<AdminTablePage> {
         );
       },
     );
+  }
+
+  void showQrcode(DocumentSnapshot document) {
+    String orderUrl =
+        '$webUrl#/request/s1KEI8hv3vt9UveKERtJ/${document['orderId']}';
+    print(orderUrl);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ShowQRCodePage(
+          url: orderUrl,
+          tableName: document['tableName'],
+        ),
+      ),
+    );
+  }
+
+  void showActionMenu(DocumentSnapshot document) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            decoration: BoxDecoration(
+                border:
+                    Border(top: BorderSide(width: 5, color: Colors.orange))),
+            child: Column(
+              children: [
+                Text(
+                  'จัดการโต๊ะ',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                ListTile(
+                  title: Text('คิดเงิน'),
+                  subtitle: Text('คิดเงินลูกค้า'),
+                  leading: Icon(
+                    Icons.money_off,
+                    color: ThemeColors.kPrimaryColor,
+                  ),
+                  trailing: Icon(Icons.arrow_right),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AdminCheckoutPage(
+                              document: document,
+                            )));
+                  },
+                ),
+                ListTile(
+                  title: Text('คิวอาร์โค้ด'),
+                  subtitle: Text('แสดง/พิมพ์ คิวอาร์โค้ด'),
+                  leading: Icon(
+                    Icons.qr_code_scanner,
+                    color: ThemeColors.kPrimaryColor,
+                  ),
+                  trailing: Icon(Icons.arrow_right),
+                  onTap: () {
+                    showQrcode(document);
+                  },
+                ),
+                ListTile(
+                  title: Text('รายการออร์เดอร์'),
+                  subtitle: Text('รายการสินค้าที่ลูกค้าสั่ง'),
+                  leading: Icon(
+                    Icons.list,
+                    color: ThemeColors.kPrimaryColor,
+                  ),
+                  trailing: Icon(Icons.arrow_right),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AdminOrderItemPage(
+                              document: document,
+                            )));
+                  },
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUrl();
   }
 
   @override
@@ -109,14 +210,16 @@ class _AdminTablePageState extends State<AdminTablePage> {
                   if (snapshot.hasError) return new Text('เกิดข้อผิดพลาด');
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      return Container(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(),
-                        ],
-                      ));
+                      return Center(
+                        child: Container(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                          ],
+                        )),
+                      );
                     default:
                       return ResponsiveGridList(
                         desiredItemWidth: 100,
@@ -126,6 +229,8 @@ class _AdminTablePageState extends State<AdminTablePage> {
                             onTap: () {
                               if (document['orderId'] == null) {
                                 showConfirmOrder(document);
+                              } else {
+                                showActionMenu(document);
                               }
                             },
                             child: Container(

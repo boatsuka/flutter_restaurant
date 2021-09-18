@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_restaurant/admin/home.dart';
 import 'package:flutter_restaurant/theme.dart';
 
 class LoginPage extends StatefulWidget {
@@ -34,8 +33,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           isError = false;
         });
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => AdminHomePage()));
+        Navigator.of(context).pushReplacementNamed('/admin');
       }
     } catch (error) {
       setState(() {
