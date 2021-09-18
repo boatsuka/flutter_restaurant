@@ -150,6 +150,7 @@ class _AdminTablePageState extends State<AdminTablePage> {
                   ),
                   trailing: Icon(Icons.arrow_right),
                   onTap: () {
+                    Navigator.of(context).pop();
                     showQrcode(document);
                   },
                 ),

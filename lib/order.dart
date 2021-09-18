@@ -51,11 +51,11 @@ class _OrderPageState extends State<OrderPage> {
                           .doc('s1KEI8hv3vt9UveKERtJ')
                           .collection('order-items')
                           .where('orderId', isEqualTo: orderId)
-                          .orderBy('orderDate', descending: false)
+                          .orderBy('orderDate', descending: true)
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          print('snapshot.error');
+                          print('${snapshot.error}');
                           return Text('${snapshot.error}');
                         }
                         switch (snapshot.connectionState) {
