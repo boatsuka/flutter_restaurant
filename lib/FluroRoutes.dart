@@ -2,8 +2,9 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/OrderRequestSplash.dart';
 import 'package:flutter_restaurant/admin/home.dart';
+import 'package:flutter_restaurant/admin/settings/addProduct.dart';
+import 'package:flutter_restaurant/admin/settings/product.dart';
 import 'package:flutter_restaurant/home.dart';
-import 'package:flutter_restaurant/order.dart';
 
 class FloruRoutes {
   static final FluroRouter router = FluroRouter();
@@ -26,9 +27,21 @@ class FloruRoutes {
     return HomePage();
   });
 
+  static Handler adminSettingProductsHandler =
+      Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
+    return AdminSettingProducts();
+  });
+
+  static Handler adminSettingAddProductHandler =
+      Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
+    return AdminSettingAddProduct();
+  });
+
   static void defineRoutes() {
     router.define('/', handler: defaultHandler);
     router.define('/admin', handler: adminHandler);
+    router.define('/admin/products', handler: adminSettingProductsHandler);
+    router.define('/admin/add/product', handler: adminSettingAddProductHandler);
     router.define('/request/:companyId/:orderId', handler: requestHandler);
   }
 }

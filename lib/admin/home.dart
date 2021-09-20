@@ -40,7 +40,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   Future logout() async {
     final _user = _auth.currentUser;
-
     if (_user != null) {
       _auth.signOut();
     }
@@ -87,6 +86,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
               leading: Icon(Icons.folder_open),
               title: Text('ข้อมูลสินค้า'),
               trailing: Icon(Icons.arrow_right),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/admin/products');
+              },
             ),
             ListTile(
               leading: Icon(Icons.group_work),

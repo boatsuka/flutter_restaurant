@@ -38,13 +38,46 @@ class _ChatPageState extends State<ChatPage> {
           .doc('s1KEI8hv3vt9UveKERtJ')
           .collection('chats')
           .doc(orderId)
-          .collection('message')
+          .collection('messages')
           .add({
         "isOpened": false,
         "message": message,
         "time": new DateTime.now().millisecondsSinceEpoch,
         "type": "CUSTOMER"
       });
+
+      QuerySnapshot qsDashboard = await dbRef
+          .collection('restaurantDB')
+          .doc('s1KEI8hv3vt9UveKERtJ')
+          .collection('chat-dashboard')
+          .where('orderId', isEqualTo: orderId)
+          .get();
+
+      if (qsDashboard.docs.length == 0) {
+        await dbRef
+            .collection('restaurantDB')
+            .doc('s1KEI8hv3vt9UveKERtJ')
+            .collection('chat-dashboard')
+            .add({
+          "isOpened": false,
+          "message": message,
+          "orderId": orderId,
+          "tableId": tableId,
+          "tableName": tableName,
+          "time": new DateTime.now().millisecondsSinceEpoch
+        });
+      } else {
+        await dbRef
+            .collection('restaurantDB')
+            .doc('s1KEI8hv3vt9UveKERtJ')
+            .collection('chat-dashboard')
+            .doc(qsDashboard.docs[0].id)
+            .update({
+          "isOpened": false,
+          "message": message,
+          "time": new DateTime.now().millisecondsSinceEpoch
+        });
+      }
 
       if (listController.hasClients) {
         listController.jumpTo(listController.position.maxScrollExtent);
@@ -71,6 +104,7 @@ class _ChatPageState extends State<ChatPage> {
             .doc(query.docs[0].id)
             .update({
           "isOpened": false,
+          "message": "เรียกพนักงาน",
           "time": new DateTime.now().millisecondsSinceEpoch,
         });
       } else {
@@ -147,7 +181,7 @@ class _ChatPageState extends State<ChatPage> {
                         .doc('s1KEI8hv3vt9UveKERtJ')
                         .collection('chats')
                         .doc(orderId)
-                        .collection('message')
+                        .collection('messages')
                         .orderBy('time', descending: false)
                         .snapshots(),
                     builder: (context, snapshot) {
@@ -185,6 +219,7 @@ class _ChatPageState extends State<ChatPage> {
         elevation: 0,
         child: TextFormField(
           controller: ctrlMessage,
+          readOnly: orderId == null ? true : false,
           decoration: InputDecoration(
             fillColor: Colors.grey[100],
             hintText: 'พิมพ์ข้อความ...',
@@ -192,16 +227,18 @@ class _ChatPageState extends State<ChatPage> {
             contentPadding: EdgeInsets.all(10),
             suffixIcon: IconButton(
               icon: Icon(Icons.send),
-              onPressed: () {
-                if (ctrlMessage.text.isNotEmpty) {
-                  String message = ctrlMessage.text;
-                  sendMessage(message);
+              onPressed: orderId != null
+                  ? () {
+                      if (ctrlMessage.text.isNotEmpty) {
+                        String message = ctrlMessage.text;
+                        sendMessage(message);
 
-                  setState(() {
-                    ctrlMessage.clear();
-                  });
-                }
-              },
+                        setState(() {
+                          ctrlMessage.clear();
+                        });
+                      }
+                    }
+                  : null,
             ),
           ),
         ),

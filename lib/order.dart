@@ -13,12 +13,15 @@ class _OrderPageState extends State<OrderPage> {
   final dbRef = FirebaseFirestore.instance;
   Helper helper = Helper();
   String orderId;
+  String tableName;
 
   Future getOrderId() async {
     String _orderId = await helper.getStorage('orderId');
+    String _tableName = await helper.getStorage('tableName');
 
     setState(() {
       orderId = _orderId;
+      tableName = _tableName;
     });
   }
 
@@ -37,7 +40,7 @@ class _OrderPageState extends State<OrderPage> {
           Padding(
             padding: const EdgeInsets.only(top: 15, bottom: 5),
             child: Text(
-              'โต๊ะ 1',
+              '${tableName ?? 'กรุณาเลือกโต๊ะ'}',
               style: TextStyle(color: Colors.pink, fontSize: 20),
             ),
           ),

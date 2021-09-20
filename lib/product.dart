@@ -13,7 +13,7 @@ class _ProductPageState extends State<ProductPage> {
   final dbRef = FirebaseFirestore.instance;
 
   bool isloading = false;
-  String categoryId = "";
+  String categoryId;
   List<DocumentSnapshot> products = [];
 
   Future getProducts() async {

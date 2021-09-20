@@ -41,7 +41,7 @@ class CustomerChatItem extends StatelessWidget {
               ),
               Positioned(
                 child: Text(
-                  '${helper.timestampToTime(date)}',
+                  '${helper.timestampToTime(date)} น. ${message['isOpened'] != null && message['isOpened'] ? '(อ่านแล้ว)' : ''}',
                   style: TextStyle(fontSize: 10),
                 ),
                 bottom: 1,

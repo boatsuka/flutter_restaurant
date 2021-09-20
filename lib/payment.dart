@@ -87,6 +87,7 @@ class _PaymentPageState extends State<PaymentPage> {
             .doc(query.docs[0].id)
             .update({
           "isOpened": false,
+          "message": "เก็บเงิน",
           "time": new DateTime.now().millisecondsSinceEpoch,
         });
       } else {
