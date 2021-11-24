@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/widgets/CategoryWidget.dart';
 import 'package:flutter_restaurant/widgets/ProductListWidget.dart';
 import 'package:flutter_restaurant/widgets/PromotionWidget.dart';
@@ -13,8 +14,20 @@ class _ProductPageState extends State<ProductPage> {
   final dbRef = FirebaseFirestore.instance;
 
   bool isloading = false;
+  String companyId;
   String categoryId;
+  Helper helper = Helper();
   List<DocumentSnapshot> products = [];
+
+  Future checkCompanyInfo() async {
+    String _companyId = await helper.getStorage('companyId');
+
+    setState(() {
+      companyId = _companyId;
+    });
+
+    getProducts();
+  }
 
   Future getProducts() async {
     setState(() {
@@ -22,7 +35,7 @@ class _ProductPageState extends State<ProductPage> {
     });
     QuerySnapshot snapshot = await dbRef
         .collection('restaurantDB')
-        .doc('s1KEI8hv3vt9UveKERtJ')
+        .doc(companyId)
         .collection('products')
         .where('categoryId', isEqualTo: categoryId)
         .get();
@@ -36,8 +49,7 @@ class _ProductPageState extends State<ProductPage> {
   @override
   void initState() {
     super.initState();
-
-    getProducts();
+    checkCompanyInfo();
   }
 
   @override

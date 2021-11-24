@@ -95,16 +95,28 @@ class _AdminHomePageState extends State<AdminHomePage> {
               leading: Icon(Icons.group_work),
               title: Text('ข้อมูลหมวดหมู่สินค้า'),
               trailing: Icon(Icons.arrow_right),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/admin/categories');
+              },
             ),
             ListTile(
               leading: Icon(Icons.table_chart),
               title: Text('ข้อมูลโต๊ะ'),
               trailing: Icon(Icons.arrow_right),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/admin/tables');
+              },
             ),
             ListTile(
               leading: Icon(Icons.store),
               title: Text('ข้อมูลร้านค้า'),
               trailing: Icon(Icons.arrow_right),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushNamed('/admin/company');
+              },
             ),
           ],
         ),

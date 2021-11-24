@@ -42,13 +42,16 @@ class _OrderRequestSplashPageState extends State<OrderRequestSplashPage> {
         await helper.setStorage("tableId", tableId);
         await helper.setStorage("tableName", tableName);
         await helper.setStorage("orderId", orderId);
+        await helper.setStorage("companyId", widget.companyId);
 
         Navigator.of(context).pushReplacementNamed('/');
       } else {
         print('Order closed');
+        Navigator.of(context).pushReplacementNamed('/');
       }
     } else {
       print('ไม่พบรายการออร์เดอร์');
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 

@@ -18,8 +18,17 @@ class _PaymentPageState extends State<PaymentPage> {
   String orderId;
   String tableId;
   String tableName;
+  String companyId;
 
   List<DocumentSnapshot> items = [];
+
+  Future checkCompanyInfo() async {
+    String _companyId = await helper.getStorage('companyId');
+
+    setState(() {
+      companyId = _companyId;
+    });
+  }
 
   Future getInfo() async {
     String _orderId = await helper.getStorage('orderId');
@@ -40,7 +49,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Future getOrders() async {
     QuerySnapshot query = await dbRef
         .collection('restaurantDB')
-        .doc('s1KEI8hv3vt9UveKERtJ')
+        .doc(companyId)
         .collection('order-items')
         .where('orderId', isEqualTo: orderId)
         .where('itemStatus', isEqualTo: 'SERVED')
@@ -74,7 +83,7 @@ class _PaymentPageState extends State<PaymentPage> {
     try {
       QuerySnapshot query = await dbRef
           .collection('restaurantDB')
-          .doc('s1KEI8hv3vt9UveKERtJ')
+          .doc(companyId)
           .collection('calls')
           .where('orderId', isEqualTo: orderId)
           .get();
@@ -82,7 +91,7 @@ class _PaymentPageState extends State<PaymentPage> {
       if (query.docs.length > 0) {
         await dbRef
             .collection('restaurantDB')
-            .doc('s1KEI8hv3vt9UveKERtJ')
+            .doc(companyId)
             .collection('calls')
             .doc(query.docs[0].id)
             .update({
@@ -93,7 +102,7 @@ class _PaymentPageState extends State<PaymentPage> {
       } else {
         await dbRef
             .collection('restaurantDB')
-            .doc('s1KEI8hv3vt9UveKERtJ')
+            .doc(companyId)
             .collection('calls')
             .add({
           "isOpened": false,
@@ -112,6 +121,7 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
+    checkCompanyInfo();
     getInfo();
   }
 

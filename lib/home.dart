@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/login.dart';
 import 'package:flutter_restaurant/theme.dart';
 import 'package:flutter_restaurant/chat.dart';
@@ -16,6 +17,21 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
   List pages = [ProductPage(), OrderPage(), ChatPage(), PaymentPage()];
+  Helper helper = new Helper();
+
+  Future checkCompanyInfo() async {
+    String companyId = await helper.getStorage('companyId');
+
+    if (companyId == null) {
+      Navigator.of(context).pushReplacementNamed('/not-found');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkCompanyInfo();
+  }
 
   @override
   Widget build(BuildContext context) {

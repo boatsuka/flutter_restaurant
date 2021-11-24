@@ -21,8 +21,17 @@ class _AddOrderPageState extends State<AddOrderPage> {
   Map selectedOption;
   String selectedOptionName;
 
-  final dbRef = FirebaseFirestore.instance;
+  String companyId;
   Helper helper = Helper();
+  final dbRef = FirebaseFirestore.instance;
+
+  Future checkCompanyInfo() async {
+    String _companyId = await helper.getStorage('companyId');
+
+    setState(() {
+      companyId = _companyId;
+    });
+  }
 
   Future saveOrder() async {
     String tableId = await helper.getStorage('tableId');
@@ -31,7 +40,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
 
     await dbRef
         .collection('restaurantDB')
-        .doc('s1KEI8hv3vt9UveKERtJ')
+        .doc(companyId)
         .collection('order-items')
         .add({
       "itemStatus": "PREPARED",
@@ -61,6 +70,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   void initState() {
     super.initState();
     initData();
+    checkCompanyInfo();
   }
 
   @override

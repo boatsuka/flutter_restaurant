@@ -15,9 +15,20 @@ class _ChatPageState extends State<ChatPage> {
   String orderId;
   String tableId;
   String tableName;
+  String companyId;
 
   ScrollController listController;
   TextEditingController ctrlMessage = TextEditingController();
+
+  Future checkCompanyInfo() async {
+    String _companyId = await helper.getStorage('companyId');
+
+    setState(() {
+      companyId = _companyId;
+    });
+
+    getInfo();
+  }
 
   Future getInfo() async {
     String _orderId = await helper.getStorage('orderId');
@@ -35,7 +46,7 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await dbRef
           .collection('restaurantDB')
-          .doc('s1KEI8hv3vt9UveKERtJ')
+          .doc(companyId)
           .collection('chats')
           .doc(orderId)
           .collection('messages')
@@ -48,7 +59,7 @@ class _ChatPageState extends State<ChatPage> {
 
       QuerySnapshot qsDashboard = await dbRef
           .collection('restaurantDB')
-          .doc('s1KEI8hv3vt9UveKERtJ')
+          .doc(companyId)
           .collection('chat-dashboard')
           .where('orderId', isEqualTo: orderId)
           .get();
@@ -56,7 +67,7 @@ class _ChatPageState extends State<ChatPage> {
       if (qsDashboard.docs.length == 0) {
         await dbRef
             .collection('restaurantDB')
-            .doc('s1KEI8hv3vt9UveKERtJ')
+            .doc(companyId)
             .collection('chat-dashboard')
             .add({
           "isOpened": false,
@@ -69,7 +80,7 @@ class _ChatPageState extends State<ChatPage> {
       } else {
         await dbRef
             .collection('restaurantDB')
-            .doc('s1KEI8hv3vt9UveKERtJ')
+            .doc(companyId)
             .collection('chat-dashboard')
             .doc(qsDashboard.docs[0].id)
             .update({
@@ -91,7 +102,7 @@ class _ChatPageState extends State<ChatPage> {
     try {
       QuerySnapshot query = await dbRef
           .collection('restaurantDB')
-          .doc('s1KEI8hv3vt9UveKERtJ')
+          .doc(companyId)
           .collection('calls')
           .where('orderId', isEqualTo: orderId)
           .get();
@@ -99,7 +110,7 @@ class _ChatPageState extends State<ChatPage> {
       if (query.docs.length > 0) {
         await dbRef
             .collection('restaurantDB')
-            .doc('s1KEI8hv3vt9UveKERtJ')
+            .doc(companyId)
             .collection('calls')
             .doc(query.docs[0].id)
             .update({
@@ -110,7 +121,7 @@ class _ChatPageState extends State<ChatPage> {
       } else {
         await dbRef
             .collection('restaurantDB')
-            .doc('s1KEI8hv3vt9UveKERtJ')
+            .doc(companyId)
             .collection('calls')
             .add({
           "isOpened": false,
@@ -130,7 +141,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     listController = ScrollController(keepScrollOffset: true);
-    getInfo();
+    checkCompanyInfo();
   }
 
   @override
