@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
-  List pages = [ProductPage(), OrderPage(), ChatPage(), PaymentPage()];
+  List pages = [ProductPage(), OrderPage(), PaymentPage()];
   Helper helper = new Helper();
 
   Future checkCompanyInfo() async {
@@ -75,8 +75,6 @@ class _HomePageState extends State<HomePage> {
               icon: Icon(Icons.shopping_cart), label: 'สั่งอาหาร'),
           BottomNavigationBarItem(
               icon: Icon(Icons.shopping_basket), label: 'รายการที่สั่ง'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat), label: 'ติดต่อพนักงาน'),
           BottomNavigationBarItem(icon: Icon(Icons.payment), label: 'ชำระเงิน')
         ],
       ),

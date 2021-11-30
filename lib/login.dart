@@ -23,7 +23,9 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       UserCredential authResult = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
 
       if (authResult == null) {
         setState(() {

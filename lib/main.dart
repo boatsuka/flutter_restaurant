@@ -18,7 +18,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Prompt',
         primaryColor: ThemeColors.kPrimaryColor,
-        accentColor: ThemeColors.kAccentColor,
+        colorScheme: ColorScheme.fromSwatch()
+            .copyWith(secondary: ThemeColors.kAccentColor),
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',

@@ -21,7 +21,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
     AdminOrderPage(),
     AdminTablePage(),
     AdminCallPage(),
-    AdminChatPage()
   ];
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -141,8 +140,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
               icon: Icon(Icons.shopping_cart), label: 'ออร์เดอร์'),
           BottomNavigationBarItem(icon: Icon(Icons.table_chart), label: 'โต๊ะ'),
           BottomNavigationBarItem(icon: Icon(Icons.call), label: 'ลูกค้าเรียก'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble), label: 'ข้อความ')
         ],
       ),
     );
