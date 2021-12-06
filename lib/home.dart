@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/login.dart';
 import 'package:flutter_restaurant/theme.dart';
-import 'package:flutter_restaurant/chat.dart';
+// import 'package:flutter_restaurant/chat.dart';
 import 'package:flutter_restaurant/order.dart';
 import 'package:flutter_restaurant/payment.dart';
 import 'package:flutter_restaurant/product.dart';
@@ -15,15 +16,75 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String orderId;
+  String tableId;
+  String tableName;
+  String companyId;
   int selectedIndex = 0;
-  List pages = [ProductPage(), OrderPage(), PaymentPage()];
   Helper helper = new Helper();
+  final dbRef = FirebaseFirestore.instance;
+  List pages = [ProductPage(), OrderPage(), PaymentPage()];
+
+  Future getInfo() async {
+    String _companyId = await helper.getStorage('companyId');
+    String _orderId = await helper.getStorage('orderId');
+    String _tableId = await helper.getStorage('tableId');
+    String _tableName = await helper.getStorage('tableName');
+
+    setState(() {
+      orderId = _orderId;
+      tableId = _tableId;
+      tableName = _tableName;
+      companyId = _companyId;
+    });
+  }
 
   Future checkCompanyInfo() async {
     String companyId = await helper.getStorage('companyId');
 
     if (companyId == null) {
       Navigator.of(context).pushReplacementNamed('/not-found');
+    }
+
+    getInfo();
+  }
+
+  Future callEmployee() async {
+    try {
+      QuerySnapshot query = await dbRef
+          .collection('restaurantDB')
+          .doc(companyId)
+          .collection('calls')
+          .where('orderId', isEqualTo: orderId)
+          .get();
+
+      if (query.docs.length > 0) {
+        await dbRef
+            .collection('restaurantDB')
+            .doc(companyId)
+            .collection('calls')
+            .doc(query.docs[0].id)
+            .update({
+          "isOpened": false,
+          "message": "เรียกพนักงาน",
+          "time": new DateTime.now().millisecondsSinceEpoch,
+        });
+      } else {
+        await dbRef
+            .collection('restaurantDB')
+            .doc(companyId)
+            .collection('calls')
+            .add({
+          "isOpened": false,
+          "message": "เรียกพนักงาน",
+          "time": new DateTime.now().millisecondsSinceEpoch,
+          "tableId": tableId,
+          "tableName": tableName,
+          "orderId": orderId
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -60,6 +121,18 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
       ),
       body: pages[selectedIndex],
+      floatingActionButton: selectedIndex != 2
+          ? FloatingActionButton(
+              onPressed: () {
+                callEmployee();
+              },
+              child: Icon(
+                Icons.phone,
+                color: Colors.white,
+              ),
+              backgroundColor: ThemeColors.kPrepareColor,
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels: true,
         selectedItemColor: ThemeColors.kPrimaryColor,

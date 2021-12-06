@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/helper.dart';
-import 'package:flutter_restaurant/theme.dart';
+// import 'package:flutter_restaurant/theme.dart';
 import 'package:flutter_restaurant/widgets/OrderItemWidget.dart';
 
 class OrderPage extends StatefulWidget {
@@ -81,47 +81,47 @@ class _OrderPageState extends State<OrderPage> {
                     ))
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        elevation: 1,
-        child: Container(
-          height: 45,
-          margin: EdgeInsets.only(left: 10, right: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Text('เสร็จแล้ว'),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(color: ThemeColors.kServedColor, width: 5),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Text('กำลังปรุง'),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left:
-                        BorderSide(color: ThemeColors.kPrepareColor, width: 5),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Text('ยกเลิก'),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left:
-                        BorderSide(color: ThemeColors.kCanceledColor, width: 5),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      // bottomNavigationBar: BottomAppBar(
+      //   elevation: 1,
+      //   child: Container(
+      //     height: 45,
+      //     margin: EdgeInsets.only(left: 10, right: 10),
+      //     child: Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         Container(
+      //           padding: EdgeInsets.only(left: 10),
+      //           child: Text('เสร็จแล้ว'),
+      //           decoration: BoxDecoration(
+      //             border: Border(
+      //               left: BorderSide(color: ThemeColors.kServedColor, width: 5),
+      //             ),
+      //           ),
+      //         ),
+      //         Container(
+      //           padding: EdgeInsets.only(left: 10),
+      //           child: Text('กำลังปรุง'),
+      //           decoration: BoxDecoration(
+      //             border: Border(
+      //               left:
+      //                   BorderSide(color: ThemeColors.kPrepareColor, width: 5),
+      //             ),
+      //           ),
+      //         ),
+      //         Container(
+      //           padding: EdgeInsets.only(left: 10),
+      //           child: Text('ยกเลิก'),
+      //           decoration: BoxDecoration(
+      //             border: Border(
+      //               left:
+      //                   BorderSide(color: ThemeColors.kCanceledColor, width: 5),
+      //             ),
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
     );
   }
 }
