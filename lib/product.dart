@@ -64,7 +64,9 @@ class _ProductPageState extends State<ProductPage> {
         children: [
           Container(
             margin: EdgeInsets.only(top: 5),
-            child: PromotionWidget(),
+            child: PromotionWidget(
+              onAdded: () => widget.onAddItem(),
+            ),
             color: Colors.white,
             height: 150,
           ),

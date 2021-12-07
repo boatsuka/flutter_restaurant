@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_restaurant/addOrder.dart';
+import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/widgets/ProductItemBox.dart';
 
 class PromotionWidget extends StatefulWidget {
+  final Function() onAdded;
+
+  PromotionWidget({@required this.onAdded});
 
   @override
   _PromotionWidgetState createState() => _PromotionWidgetState();
@@ -10,7 +15,7 @@ class PromotionWidget extends StatefulWidget {
 
 class _PromotionWidgetState extends State<PromotionWidget> {
   final dbRef = FirebaseFirestore.instance;
-
+  Helper helper = Helper();
   bool isloading = false;
   List<DocumentSnapshot> promotions = [];
 
@@ -65,37 +70,54 @@ class _PromotionWidgetState extends State<PromotionWidget> {
                   spacing: 8,
                   runSpacing: 8,
                   children: promotions.map((document) {
-                    return Column(
-                      children: [
-                        Stack(
-                          children: [
-                            ProductItemBox(
-                              imageUrl: document['imageUrl'],
-                              width: 100,
-                              height: 70,
+                    return GestureDetector(
+                      onTap: () async {
+                        String orderId = await helper.getStorage('orderId');
+                        if (orderId != null) {
+                          var res = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  AddOrderPage(product: document),
                             ),
-                            Container(
-                              margin: EdgeInsets.all(5),
-                              child: Text(
-                                'ใหม่',
-                                style: TextStyle(color: Colors.pink),
+                          );
+
+                          if (res != null) {
+                            widget.onAdded();
+                          }
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          Stack(
+                            children: [
+                              ProductItemBox(
+                                imageUrl: document['imageUrl'],
+                                width: 100,
+                                height: 70,
                               ),
-                              decoration: BoxDecoration(
-                                  color: Colors.pink[50],
-                                  borderRadius: BorderRadius.circular(5)),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            document['productName'],
-                            maxLines: 1,
-                            softWrap: false,
-                            overflow: TextOverflow.ellipsis,
+                              Container(
+                                margin: EdgeInsets.all(5),
+                                child: Text(
+                                  'ใหม่',
+                                  style: TextStyle(color: Colors.pink),
+                                ),
+                                decoration: BoxDecoration(
+                                    color: Colors.pink[50],
+                                    borderRadius: BorderRadius.circular(5)),
+                              ),
+                            ],
                           ),
-                        )
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              document['productName'],
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        ],
+                      ),
                     );
                   }).toList(),
                 )
