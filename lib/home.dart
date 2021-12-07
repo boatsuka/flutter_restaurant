@@ -122,26 +122,66 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   title: Row(
+      //     children: [
+      //       Text(
+      //         'Kmitl Foods',
+      //         style: TextStyle(color: ThemeColors.kPrimaryColor),
+      //       )
+      //     ],
+      //   ),
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(
+      //         Icons.home,
+      //         color: ThemeColors.kPrimaryColor,
+      //       ),
+      //       onPressed: () {
+      //         Navigator.of(context)
+      //             .push(MaterialPageRoute(builder: (context) => LoginPage()));
+      //       },
+      //     ),
+      //   ],
+      //   backgroundColor: Colors.white,
+      //   shadowColor: Colors.white,
+      // ),
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text(
-              'Kmitl Foods',
-              style: TextStyle(color: ThemeColors.kPrimaryColor),
-            )
-          ],
+        title: Center(
+          child: Text(
+            'Kmitl Food',
+            style: TextStyle(color: ThemeColors.kPrimaryColor),
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.home,
+            color: ThemeColors.kPrimaryColor,
+          ),
+          onPressed: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => LoginPage()));
+          },
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.home,
-              color: ThemeColors.kPrimaryColor,
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              icon: Badge(
+                shape: BadgeShape.circle,
+                borderRadius: BorderRadius.circular(80),
+                child: Icon(
+                  Icons.shopping_basket,
+                  color: ThemeColors.kPrimaryColor,
+                ),
+                badgeContent: Text(
+                  '$totalItems',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              onPressed: () => null,
             ),
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => LoginPage()));
-            },
-          ),
+          )
         ],
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
@@ -179,16 +219,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.shopping_cart), label: 'สั่งอาหาร'),
           BottomNavigationBarItem(
-              icon: Badge(
-                shape: BadgeShape.circle,
-                borderRadius: BorderRadius.circular(100),
-                child: Icon(Icons.shopping_basket),
-                badgeContent: Text(
-                  '$totalItems',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              label: 'รายการอาหารที่สั่ง'),
+              icon: Icon(Icons.shopping_basket), label: 'รายการที่สั่ง'),
           BottomNavigationBarItem(icon: Icon(Icons.payment), label: 'ชำระเงิน')
         ],
       ),
