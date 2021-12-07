@@ -7,9 +7,11 @@ import 'package:flutter_restaurant/widgets/ProductItemBox.dart';
 
 class ProductListWidget extends StatefulWidget {
   final List<DocumentSnapshot> products;
+  final Function() onAdded;
 
   const ProductListWidget({
     @required this.products,
+    @required this.onAdded,
   });
 
   @override
@@ -53,12 +55,16 @@ class _ProductListWidgetState extends State<ProductListWidget> {
                     onTap: () async {
                       String orderId = await helper.getStorage('orderId');
                       if (orderId != null) {
-                        Navigator.of(context).push(
+                        var res = await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) =>
                                 AddOrderPage(product: product),
                           ),
                         );
+
+                        if (res != null) {
+                          widget.onAdded();
+                        }
                       }
                     },
                     child: ProductItemBox(

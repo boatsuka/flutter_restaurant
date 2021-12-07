@@ -22,7 +22,7 @@ class OrderItemWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: Colors.grey[100], width: 1),
+          // bottom: BorderSide(color: Colors.grey[100], width: 1),
           right: BorderSide(
             color: this.document['itemStatus'] == 'PREPARED'
                 ? ThemeColors.kPrepareColor

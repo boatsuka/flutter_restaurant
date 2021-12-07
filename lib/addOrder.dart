@@ -56,7 +56,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
       "type": selectedType,
     });
 
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(true);
   }
 
   initData() {

@@ -1,5 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/login.dart';
 import 'package:flutter_restaurant/theme.dart';
@@ -20,10 +22,11 @@ class _HomePageState extends State<HomePage> {
   String tableId;
   String tableName;
   String companyId;
+  int totalItems = 0;
   int selectedIndex = 0;
   Helper helper = new Helper();
   final dbRef = FirebaseFirestore.instance;
-  List pages = [ProductPage(), OrderPage(), PaymentPage()];
+  // List pages = [ProductPage(onAddItem: () => getOrderTotalItems(),), OrderPage(), PaymentPage()];
 
   Future getInfo() async {
     String _companyId = await helper.getStorage('companyId');
@@ -40,13 +43,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future checkCompanyInfo() async {
-    String companyId = await helper.getStorage('companyId');
+    String _companyId = await helper.getStorage('companyId');
 
-    if (companyId == null) {
+    if (_companyId == null) {
       Navigator.of(context).pushReplacementNamed('/not-found');
-    }
+    } else {
+      setState(() {
+        companyId = _companyId;
+      });
 
-    getInfo();
+      getInfo();
+      getOrderTotalItems();
+    }
   }
 
   Future callEmployee() async {
@@ -88,6 +96,23 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future getOrderTotalItems() async {
+    try {
+      String orderId = await helper.getStorage('orderId');
+
+      QuerySnapshot snapshot = await dbRef
+          .collection('restaurantDB')
+          .doc(companyId)
+          .collection('order-items')
+          .where('orderId', isEqualTo: orderId)
+          .get();
+
+      setState(() {
+        totalItems = snapshot.docs.length;
+      });
+    } catch (e) {}
+  }
+
   @override
   void initState() {
     super.initState();
@@ -119,8 +144,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         backgroundColor: Colors.white,
+        shadowColor: Colors.white,
       ),
-      body: pages[selectedIndex],
+      body: selectedIndex == 0
+          ? ProductPage(onAddItem: () => getOrderTotalItems())
+          : selectedIndex == 1
+              ? OrderPage()
+              : selectedIndex == 2
+                  ? PaymentPage()
+                  : ProductPage(onAddItem: () => getOrderTotalItems()),
       floatingActionButton: selectedIndex != 2
           ? FloatingActionButton(
               onPressed: () {
@@ -147,7 +179,16 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.shopping_cart), label: 'สั่งอาหาร'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_basket), label: 'รายการที่สั่ง'),
+              icon: Badge(
+                shape: BadgeShape.circle,
+                borderRadius: BorderRadius.circular(100),
+                child: Icon(Icons.shopping_basket),
+                badgeContent: Text(
+                  '$totalItems',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              label: 'รายการอาหารที่สั่ง'),
           BottomNavigationBarItem(icon: Icon(Icons.payment), label: 'ชำระเงิน')
         ],
       ),

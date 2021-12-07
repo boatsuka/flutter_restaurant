@@ -6,6 +6,10 @@ import 'package:flutter_restaurant/widgets/ProductListWidget.dart';
 import 'package:flutter_restaurant/widgets/PromotionWidget.dart';
 
 class ProductPage extends StatefulWidget {
+  final Function() onAddItem;
+
+  ProductPage({@required this.onAddItem});
+
   @override
   _ProductPageState createState() => _ProductPageState();
 }
@@ -84,6 +88,7 @@ class _ProductPageState extends State<ProductPage> {
               child: products.length > 0
                   ? ProductListWidget(
                       products: products,
+                      onAdded: () => widget.onAddItem(),
                     )
                   : Center(
                       child: Container(
