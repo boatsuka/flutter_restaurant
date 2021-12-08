@@ -105,7 +105,7 @@ class OrderItemWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.food_bank,
+                            Icons.local_restaurant,
                             color: Colors.white,
                             size: 40,
                           ),

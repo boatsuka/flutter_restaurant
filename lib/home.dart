@@ -163,26 +163,15 @@ class _HomePageState extends State<HomePage> {
                 .push(MaterialPageRoute(builder: (context) => LoginPage()));
           },
         ),
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.only(right: 10),
-        //     child: IconButton(
-        //       icon: Badge(
-        //         shape: BadgeShape.circle,
-        //         borderRadius: BorderRadius.circular(80),
-        //         child: Icon(
-        //           Icons.shopping_basket,
-        //           color: ThemeColors.kPrimaryColor,
-        //         ),
-        //         badgeContent: Text(
-        //           '$totalItems',
-        //           style: TextStyle(color: Colors.white),
-        //         ),
-        //       ),
-        //       onPressed: () => null,
-        //     ),
-        //   )
-        // ],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Icon(
+              Icons.notifications,
+              color: ThemeColors.kAccentColor,
+            ),
+          )
+        ],
         backgroundColor: Colors.white,
         shadowColor: Colors.white,
       ),
@@ -199,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                 callEmployee();
               },
               child: Icon(
-                Icons.phone,
+                Icons.pan_tool_outlined,
                 color: Colors.white,
               ),
               backgroundColor: ThemeColors.kPrepareColor,
@@ -219,20 +208,19 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.shopping_cart), label: 'สั่งอาหาร'),
           BottomNavigationBarItem(
-              icon: Badge(
-                shape: BadgeShape.circle,
-                borderRadius: BorderRadius.circular(80),
-                child: Icon(
-                  Icons.shopping_basket,
-                  
-                ),
-                badgeContent: Text(
-                  '$totalItems',
-                  style: TextStyle(color: Colors.white),
-                ),
+            icon: Badge(
+              shape: BadgeShape.circle,
+              borderRadius: BorderRadius.circular(80),
+              child: Icon(
+                Icons.shopping_basket,
               ),
-              label: 'รายการที่สั่ง',
+              badgeContent: Text(
+                '$totalItems',
+                style: TextStyle(color: Colors.white),
               ),
+            ),
+            label: 'รายการที่สั่ง',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.payment), label: 'ชำระเงิน')
         ],
       ),
