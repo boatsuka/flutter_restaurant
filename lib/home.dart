@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(80),
                 child: Icon(
                   Icons.shopping_basket,
-                  color: ThemeColors.kPrimaryColor,
+                  
                 ),
                 badgeContent: Text(
                   '$totalItems',
