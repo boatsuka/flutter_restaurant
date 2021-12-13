@@ -95,8 +95,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
                 ),
                 ProductItemBox(
                   imageUrl: '${widget.product['imageUrl']}',
-                  width: 150,
-                  height: 100,
+                  width: 220,
+                  height: 200,
                 ),
                 Text('ราคา ${widget.product['price']} บาท'),
               ],
@@ -141,63 +141,37 @@ class _AddOrderPageState extends State<AddOrderPage> {
       ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
-          height: 100,
+          height: 130,
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.remove,
-                      color: ThemeColors.kAccentColor,
-                      size: 25,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        if (qty != 1) {
-                          qty--;
-                        }
-                      });
-                    },
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        color: ThemeColors.kGreyText,
-                        borderRadius: BorderRadius.circular(5)),
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    child: Text(
-                      '$qty',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: ThemeColors.kPrimaryColor),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.add_circle,
-                      color: ThemeColors.kPrimaryColor,
-                      size: 25,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        qty++;
-                      });
-                    },
-                  ),
-                ],
-              ),
               Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    Text(
+                      'ระบุจำนวน :',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    // IconButton(
+                    //   icon: Icon(
+                    //     Icons.remove,
+                    //     color: ThemeColors.kAccentColor,
+                    //     size: 25,
+                    //   ),
+                    //   onPressed: () {
+                    //     setState(() {
+                    //       if (qty != 1) {
+                    //         qty--;
+                    //       }
+                    //     });
+                    //   },
+                    // ),
                     TextButton.icon(
                       style: TextButton.styleFrom(
                         primary: Colors.white,
                         backgroundColor: ThemeColors.kAccentColor,
-                        minimumSize: Size(130, 50),
+                        minimumSize: Size(100, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(20),
@@ -205,17 +179,34 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           ),
                         ),
                       ),
-                      icon: Icon(Icons.cancel),
-                      label: Text('ยกเลิก'),
+                      icon: Icon(Icons.remove),
+                      label: Text('ลด'),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        setState(() {
+                          if (qty != 1) {
+                            qty--;
+                          }
+                        });
                       },
                     ),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        primary: ThemeColors.kPrimaryColor,
-                        onPrimary: Colors.white,
-                        minimumSize: Size(130, 50),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: ThemeColors.kGreyText,
+                          borderRadius: BorderRadius.circular(5)),
+                      padding: EdgeInsets.only(left: 10, right: 10),
+                      child: Text(
+                        '$qty',
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: ThemeColors.kPrimaryColor),
+                      ),
+                    ),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        primary: Colors.white,
+                        backgroundColor: ThemeColors.kPrimaryColor,
+                        minimumSize: Size(100, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(20),
@@ -223,10 +214,71 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           ),
                         ),
                       ),
+                      icon: Icon(Icons.add),
+                      label: Text('เพิ่ม'),
+                      onPressed: () {
+                        setState(() {
+                          qty++;
+                        });
+                      },
+                    ),
+                    // IconButton(
+                    //   icon: Icon(
+                    //     Icons.add_circle,
+                    //     color: ThemeColors.kPrimaryColor,
+                    //     size: 25,
+                    //   ),
+                    //   onPressed: () {
+                    //     setState(() {
+                    //       qty++;
+                    //     });
+                    //   },
+                    // ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // TextButton.icon(
+                    //   style: TextButton.styleFrom(
+                    //     primary: Colors.white,
+                    //     backgroundColor: ThemeColors.kAccentColor,
+                    //     minimumSize: Size(130, 50),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.only(
+                    //         topLeft: Radius.circular(20),
+                    //         bottomLeft: Radius.circular(20),
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   icon: Icon(Icons.cancel),
+                    //   label: Text('ยกเลิก'),
+                    //   onPressed: () {
+                    //     Navigator.of(context).pop();
+                    //   },
+                    // ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        primary: ThemeColors.kPrimaryColor,
+                        onPrimary: Colors.white,
+                        minimumSize: Size(400, 60),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10),
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10),
+                          ),
+                        ),
+                      ),
                       icon: Icon(Icons.check),
                       label: Text('ยืนยัน'),
                       onPressed:
-                          selectedType != null && selectedOptionName != null
+                          // selectedType != null && selectedOptionName != null
+                          selectedType != null
                               ? () {
                                   saveOrder();
                                 }

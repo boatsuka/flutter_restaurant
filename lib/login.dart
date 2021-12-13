@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/theme.dart';
@@ -10,13 +11,45 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool isError = false;
-
+  final dbRef = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   TextEditingController ctrlEmail = TextEditingController();
   TextEditingController ctrlPassword = TextEditingController();
+
+  Future getCompanyInfo(String uid) async {
+    try {
+      QuerySnapshot snapshot = await dbRef
+          .collection('restaurantDB')
+          .doc('companies')
+          .collection('users')
+          .where('uid', isEqualTo: uid)
+          .get();
+
+      DocumentSnapshot document = snapshot.docs[0];
+      String companyId = document['companyId'];
+      print(companyId);
+
+      setState(() {
+        isError = false;
+      });
+
+      // Navigator.pushNamedAndRemoveUntil(
+      //   context,
+      //   "/admin",
+      //   (r) => true,
+      // );
+
+      Future.delayed(Duration.zero, () {
+       Navigator.of(context).pushNamedAndRemoveUntil(
+            '/admin', (Route<dynamic> route) => false);
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future signIn() async {
     String email = ctrlEmail.text;
@@ -33,15 +66,9 @@ class _LoginPageState extends State<LoginPage> {
           isError = true;
         });
       } else {
-        setState(() {
-          isError = false;
-        });
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          "/admin",
-          (r) => false,
-        );
-        // Navigator.of(context).pushReplacementNamed('/admin');
+        String uid = authResult.user.uid;
+
+        getCompanyInfo(uid);
       }
     } catch (error) {
       setState(() {

@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.only(right: 10),
             child: Icon(
               Icons.notifications,
-              color: ThemeColors.kAccentColor,
+              color: ThemeColors.kPrimaryColor,
             ),
           )
         ],

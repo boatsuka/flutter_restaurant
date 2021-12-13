@@ -8,6 +8,7 @@ import 'package:flutter_restaurant/admin/settings/company.dart';
 import 'package:flutter_restaurant/admin/settings/product.dart';
 import 'package:flutter_restaurant/admin/settings/table.dart';
 import 'package:flutter_restaurant/home.dart';
+import 'package:flutter_restaurant/login.dart';
 import 'package:flutter_restaurant/notFound.dart';
 
 class FloruRoutes {
@@ -61,6 +62,11 @@ class FloruRoutes {
     return NotFoundPage();
   });
 
+  static Handler loginHandler =
+      Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
+    return LoginPage();
+  });
+
   static void defineRoutes() {
     router.define('/', handler: defaultHandler);
     router.define('/admin', handler: adminHandler);
@@ -70,6 +76,7 @@ class FloruRoutes {
     router.define('/admin/tables', handler: adminSettingTableHandler);
     router.define('/admin/company', handler: adminSettingCompanyHandler);
     router.define('/not-found', handler: notFoundHandler);
+    router.define('/login', handler: loginHandler);
     router.define('/request/:companyId/:orderId', handler: requestHandler);
   }
 }

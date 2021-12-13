@@ -42,7 +42,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       QuerySnapshot qsTable = await dbRef
           .collection('restaurantDB')
           .doc('s1KEI8hv3vt9UveKERtJ')
-          .collection('tables')
+          .collection('tables')  
           .orderBy('tableName', descending: false)
           .get();
 
