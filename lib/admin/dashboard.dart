@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/helper.dart';
@@ -15,7 +16,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Helper helper = Helper();
   DateTime reportDate;
   double totalPrice = 0;
+  double totalProduct = 0;
   List<Map> results = [];
+  List<Map> products = [];
 
   final dbRef = FirebaseFirestore.instance;
 
@@ -42,7 +45,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       QuerySnapshot qsTable = await dbRef
           .collection('restaurantDB')
           .doc('s1KEI8hv3vt9UveKERtJ')
-          .collection('tables')  
+          .collection('tables')
           .orderBy('tableName', descending: false)
           .get();
 
@@ -55,8 +58,32 @@ class _AdminDashboardState extends State<AdminDashboard> {
           .where('orderDate', isGreaterThanOrEqualTo: startDate)
           .get();
 
+      QuerySnapshot ps = await dbRef
+          .collection('restaurantDB')
+          .doc('s1KEI8hv3vt9UveKERtJ')
+          .collection('order-items')
+          .where('itemStatus', isEqualTo: 'SERVED')
+          .where('orderDate', isLessThanOrEqualTo: endDate)
+          .where('orderDate', isGreaterThanOrEqualTo: startDate)
+          .get();
+
       double _totalPrice = 0;
+      double _totalProduct = 0;
+
       List<Map> _results = [];
+      List<Map> _products = [];
+
+      ps.docs.forEach((tDocument) {
+        Map product = new Map();
+
+        double totalProduct = tDocument['qty'];
+
+        product['productName'] = tDocument['productName'];
+        product['total'] = tDocument['qty'];
+
+        _totalProduct += totalProduct;
+        _products.add(product);
+      });
 
       qsTable.docs.forEach((tDocument) {
         Map table = new Map();
@@ -65,6 +92,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
         qs.docs.forEach((document) {
           Map data = document.data();
+
           if (document['tableId'] == tDocument.id) {
             double qtyPrice = document['qty'] * document['price'];
             if (data.containsKey('options')) {
@@ -84,6 +112,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
       setState(() {
         results = _results;
+        products = _products;
+        totalProduct = _totalProduct;
         totalPrice = _totalPrice;
       });
     } catch (error) {
@@ -125,13 +155,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           child: child,
                           data: ThemeData.light().copyWith(
                               primaryColor: ThemeColors.kPrimaryColor,
-                              accentColor: ThemeColors.kAccentColor,
-                              colorScheme: ColorScheme.light(
-                                primary: ThemeColors.kPrimaryColor,
-                              ),
                               buttonTheme: ButtonThemeData(
                                 textTheme: ButtonTextTheme.primary,
-                              )),
+                              ),
+                              colorScheme: ColorScheme.light(
+                                primary: ThemeColors.kPrimaryColor,
+                              ).copyWith(secondary: ThemeColors.kAccentColor)),
                         );
                       });
                   if (selectedDate != null) {
@@ -157,24 +186,52 @@ class _AdminDashboardState extends State<AdminDashboard> {
             borderRadius: BorderRadius.circular(20),
             color: ThemeColors.kPrimaryColor,
           ),
-          child: Column(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'รวมเป็นเงิน',
-                style: TextStyle(color: Colors.white),
+              Container(
+                padding: EdgeInsets.only(right: 80),
+                child: Column(
+                  children: [
+                    Text(
+                      'รวมเป็นเงิน',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      '${helper.formatNumber(totalPrice, 0)}',
+                      style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange),
+                    ),
+                    Text(
+                      'บาท',
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
               ),
-              Text(
-                '${helper.formatNumber(totalPrice, 0)}',
-                style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange),
-              ),
-              Text(
-                'บาท',
-                style: TextStyle(color: Colors.white),
+              Container(
+                child: Column(
+                  children: [
+                    Text(
+                      'รวมเป็นอาหาร',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      '${helper.formatNumber(totalProduct, 0)}',
+                      style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange),
+                    ),
+                    Text(
+                      'จำนวน',
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
               )
             ],
           ),
@@ -187,6 +244,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
             rows: results.map((item) {
               return DataRow(cells: [
                 DataCell(Text('${item['tableName']}')),
+                DataCell(Text('${helper.formatNumber(item['total'], 0)}')),
+              ]);
+            }).toList()),
+        DataTable(
+            columns: [
+              DataColumn(label: Text('เมนู')),
+              DataColumn(label: Text('จำนวน'), numeric: true)
+            ],
+            rows: products.map((item) {
+              return DataRow(cells: [
+                DataCell(Text('${item['productName']}')),
                 DataCell(Text('${helper.formatNumber(item['total'], 0)}')),
               ]);
             }).toList())
