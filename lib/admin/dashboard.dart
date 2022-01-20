@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/helper.dart';
@@ -58,6 +57,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
           .where('orderDate', isGreaterThanOrEqualTo: startDate)
           .get();
 
+      QuerySnapshot p = await dbRef
+          .collection('restaurantDB')
+          .doc('s1KEI8hv3vt9UveKERtJ')
+          .collection('products')
+          .get();
+
       QuerySnapshot ps = await dbRef
           .collection('restaurantDB')
           .doc('s1KEI8hv3vt9UveKERtJ')
@@ -73,15 +78,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
       List<Map> _results = [];
       List<Map> _products = [];
 
-      ps.docs.forEach((tDocument) {
+      p.docs.forEach((tDocument) {
         Map product = new Map();
-
-        double totalProduct = tDocument['qty'];
-
+        double _qtyProducts = 0;
         product['productName'] = tDocument['productName'];
-        product['total'] = tDocument['qty'];
 
-        _totalProduct += totalProduct;
+        ps.docs.forEach((document) {
+          if (document['productId'] == tDocument.id) {
+            double qtyProduct = document['qty'];
+
+            _qtyProducts += qtyProduct;
+            _totalProduct += qtyProduct;
+          }
+        });
+        product['total'] = _qtyProducts;
         _products.add(product);
       });
 
