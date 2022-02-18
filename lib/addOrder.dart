@@ -43,7 +43,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
         .doc(companyId)
         .collection('order-items')
         .add({
-      "itemStatus": "PREPARED",
+      "itemStatus": "ORDERING",
       "options": selectedOption,
       "orderDate": new DateTime.now().millisecondsSinceEpoch,
       "orderId": orderId,

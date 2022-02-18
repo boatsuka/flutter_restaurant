@@ -92,62 +92,80 @@ class OrderItemWidget extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                color: this.document['itemStatus'] == 'PREPARED'
-                    ? ThemeColors.kPrepareColor
-                    : this.document['itemStatus'] == 'SERVED'
-                        ? ThemeColors.kServedColor
-                        : ThemeColors.kCanceledColor,
-                width: 85,
-                height: 130,
-                child: this.document['itemStatus'] == 'PREPARED'
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.local_restaurant,
-                            color: Colors.white,
-                            size: 40,
-                          ),
-                          Text('กำลังปรุง',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold))
-                        ],
-                      )
-                    : this.document['itemStatus'] == 'SERVED'
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: 40,
-                              ),
-                              Text('เสร็จแล้ว',
-                                  style: TextStyle(
+                  color: 
+                      this.document['itemStatus'] == 'ORDERING'
+                      ? ThemeColors.kAccentColor
+                      : this.document['itemStatus'] == 'PREPARED'
+                          ? ThemeColors.kPrepareColor
+                          : this.document['itemStatus'] == 'SERVED'
+                            ? ThemeColors.kServedColor
+                            : ThemeColors.kCanceledColor,
+                  width: 85,
+                  height: 130,
+                  child: this.document['itemStatus'] == 'ORDERING'
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.shopping_basket_outlined,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                            Text('สั่งแล้ว',
+                                style: TextStyle(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ))
-                            ],
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.cancel,
-                                color: Colors.white,
-                                size: 40,
-                              ),
-                              Text('ยกเลิก',
-                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold),)
+                          ],
+                        )
+                      : this.document['itemStatus'] == 'PREPARED'
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.local_restaurant,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                                Text('กำลังปรุง',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold))
+                              ],
+                            )
+                          : this.document['itemStatus'] == 'SERVED'
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check,
                                       color: Colors.white,
-                                      fontWeight: FontWeight.bold))
-                            ],
-                          ),
-              ),
+                                      size: 40,
+                                    ),
+                                    Text('เสร็จแล้ว',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ))
+                                  ],
+                                )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.cancel,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                    Text('ยกเลิก',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                )),
               SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -205,7 +223,10 @@ class OrderItemWidget extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 5),
                 child: Text(
                   '$totalPrice',
-                  style: TextStyle(fontSize: 25, color: Colors.pink, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 25,
+                      color: Colors.pink,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ],
