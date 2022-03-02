@@ -13,9 +13,11 @@ class AdminOrderPage extends StatefulWidget {
 class _AdminOrderPageState extends State<AdminOrderPage> {
   final dbRef = FirebaseFirestore.instance;
   Helper helper = Helper();
+  List<String> orders = [];
   List pages = [0, 1];
 
   int qty = 1;
+  int _currentPage = 0;
 
   void changeItemStatus(DocumentSnapshot document, String itemStatus) async {
     await dbRef
@@ -23,7 +25,10 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
         .doc('s1KEI8hv3vt9UveKERtJ')
         .collection('order-items')
         .doc(document.id)
-        .update({'itemStatus': itemStatus});
+        .update({
+      'itemStatus': itemStatus,
+      'statusDate': DateTime.now().millisecondsSinceEpoch
+    });
   }
 
   void editQty(DocumentSnapshot document) {
@@ -222,28 +227,381 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
         });
   }
 
+  checkOrderID() async {
+    await dbRef
+        .collection('restaurantDB')
+        .doc('s1KEI8hv3vt9UveKERtJ')
+        .collection('orders')
+        .where('orderStatus', isEqualTo: 'OPEN')
+        .get()
+        .then((value) {
+      value.docs.forEach((e) {
+        orders.add(e.id);
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkOrderID();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      children: [
-        CarouselSlider(
-          items: [
-            Container(
-              child: Row(
-                children: [
-                  Flexible(
-                      flex: 1,
-                      child: Container(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
+      body: Column(
+        children: [
+          _currentPage == 0
+              ? Container(
+                  height: 70,
+                  child: Card(
+                    child: Center(
+                      child: Text(
+                        'ห้องครัว',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ),
+                )
+              : Container(
+                  height: 70,
+                  child: Card(
+                    child: Center(
+                      child: Text('เคาเตอร์', style: TextStyle(fontSize: 20)),
+                    ),
+                  ),
+                ),
+          CarouselSlider(
+            items: [
+              Container(
+                child: Row(
+                  children: [
+                    Flexible(
+                        flex: 1,
+                        child: Container(
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: dbRef
+                                    .collection('restaurantDB')
+                                    .doc('s1KEI8hv3vt9UveKERtJ')
+                                    .collection('order-items')
+                                    .where('itemStatus', isEqualTo: 'ORDERING')
+                                    .orderBy('orderDate', descending: true)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    print(snapshot.error);
+                                    return Text('เกิดข้อผิดผลาด');
+                                  }
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.waiting:
+                                      return Text('Loading...');
+                                      break;
+                                    default:
+                                      return ResponsiveGridList(
+                                        desiredItemWidth: 150,
+                                        minSpacing: 10,
+                                        children: snapshot.data.docs.map((doc) {
+                                          Map document = doc.data();
+                                          DateTime date = new DateTime
+                                                  .fromMillisecondsSinceEpoch(
+                                              doc['orderDate']);
+                                          return GestureDetector(
+                                            child: Container(
+                                              alignment: Alignment.topCenter,
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      Colors.orangeAccent[100],
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: Stack(
+                                                children: [
+                                                  Container(
+                                                    height: 120,
+                                                    margin: EdgeInsets.all(10),
+                                                    // decoration: BoxDecoration(color: Colors.white),
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              '${doc['productName']}',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            Text(
+                                                              'x${doc['qty']}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .pink,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            )
+                                                          ],
+                                                        ),
+                                                        Divider(),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            document.containsKey(
+                                                                    'type')
+                                                                ? Text(
+                                                                    '${document['type']}')
+                                                                : Container(),
+                                                            document.containsKey(
+                                                                    'options')
+                                                                ? Text(
+                                                                    '${document['options']['name']}')
+                                                                : Container(),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                        height: 40,
+                                                        width: 80,
+                                                        alignment:
+                                                            Alignment.center,
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: ThemeColors
+                                                              .kPrimaryColor,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Text(
+                                                          '${doc['tableName']}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.orange,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                          '${helper.timestampToTime(date)} น.'),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            onTap: () => changeItemStatus(
+                                                doc, 'PREPARED'),
+                                            onLongPress: () =>
+                                                showActionMenu(doc),
+                                          );
+                                        }).toList(),
+                                      );
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        )),
+                    Flexible(
+                        flex: 1,
+                        child: Container(
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: dbRef
+                                    .collection('restaurantDB')
+                                    .doc('s1KEI8hv3vt9UveKERtJ')
+                                    .collection('order-items')
+                                    .where('itemStatus', isEqualTo: 'PREPARED')
+                                    .orderBy('orderDate', descending: true)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    print(snapshot.error);
+                                    return Text('เกิดข้อผิดผลาด');
+                                  }
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.waiting:
+                                      return Text('Loading...');
+                                      break;
+                                    default:
+                                      return ResponsiveGridList(
+                                        desiredItemWidth: 150,
+                                        minSpacing: 10,
+                                        children: snapshot.data.docs.map((doc) {
+                                          Map document = doc.data();
+                                          DateTime date = new DateTime
+                                                  .fromMillisecondsSinceEpoch(
+                                              doc['orderDate']);
+                                          return GestureDetector(
+                                            child: Container(
+                                              alignment: Alignment.topCenter,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.amber,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: Stack(
+                                                children: [
+                                                  Container(
+                                                    height: 120,
+                                                    margin: EdgeInsets.all(10),
+                                                    // decoration: BoxDecoration(color: Colors.white),
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              '${doc['productName']}',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            Text(
+                                                              'x${doc['qty']}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .pink,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            )
+                                                          ],
+                                                        ),
+                                                        Divider(),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            document.containsKey(
+                                                                    'type')
+                                                                ? Text(
+                                                                    '${document['type']}')
+                                                                : Container(),
+                                                            document.containsKey(
+                                                                    'options')
+                                                                ? Text(
+                                                                    '${document['options']['name']}')
+                                                                : Container(),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                        height: 40,
+                                                        width: 80,
+                                                        alignment:
+                                                            Alignment.center,
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: ThemeColors
+                                                              .kPrimaryColor,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                        child: Text(
+                                                          '${doc['tableName']}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.orange,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                          '${helper.timestampToTime(date)} น.'),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            onTap: () =>
+                                                changeItemStatus(doc, 'SERVED'),
+                                            onLongPress: () =>
+                                                showActionMenu(doc),
+                                          );
+                                        }).toList(),
+                                      );
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ))
+                  ],
+                ),
+              ),
+              Container(
+                child: Row(
+                  children: [
+                    Flexible(
+                        flex: 1,
+                        child: Container(
+                          child: Card(
                             child: StreamBuilder<QuerySnapshot>(
                               stream: dbRef
                                   .collection('restaurantDB')
                                   .doc('s1KEI8hv3vt9UveKERtJ')
                                   .collection('order-items')
-                                  .where('itemStatus', isEqualTo: 'ORDERING')
+                                  .where('itemStatus', isEqualTo: 'SERVED')
                                   .orderBy('orderDate', descending: true)
                                   .snapshots(),
                               builder: (context, snapshot) {
@@ -268,7 +626,152 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                           child: Container(
                                             alignment: Alignment.topCenter,
                                             decoration: BoxDecoration(
-                                                color: Colors.orangeAccent[100],
+                                                color: Colors.greenAccent[100],
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            child: Stack(
+                                              children: [
+                                                Container(
+                                                  height: 120,
+                                                  margin: EdgeInsets.all(10),
+                                                  // decoration: BoxDecoration(color: Colors.white),
+                                                  alignment:
+                                                      Alignment.bottomCenter,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            '${doc['productName']}',
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          Text(
+                                                            'x${doc['qty']}',
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.pink,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Divider(),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          document.containsKey(
+                                                                  'type')
+                                                              ? Text(
+                                                                  '${document['type']}')
+                                                              : Container(),
+                                                          document.containsKey(
+                                                                  'options')
+                                                              ? Text(
+                                                                  '${document['options']['name']}')
+                                                              : Container(),
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      height: 40,
+                                                      width: 80,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      padding: EdgeInsets.only(
+                                                          left: 10, right: 10),
+                                                      decoration: BoxDecoration(
+                                                        color: ThemeColors
+                                                            .kPrimaryColor,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      child: Text(
+                                                        '${doc['tableName']}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.orange,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                        '${helper.timestampToTime(date)} น.'),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          onLongPress: () =>
+                                              showActionMenu(doc),
+                                        );
+                                      }).toList(),
+                                    );
+                                }
+                              },
+                            ),
+                          ),
+                        )),
+                    Flexible(
+                        flex: 1,
+                        child: Container(
+                          child: Card(
+                            child: StreamBuilder<QuerySnapshot>(
+                              stream: dbRef
+                                  .collection('restaurantDB')
+                                  .doc('s1KEI8hv3vt9UveKERtJ')
+                                  .collection('order-items')
+                                  .where('itemStatus', isEqualTo: 'CANCELED')
+                                  .orderBy('orderDate', descending: true)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  print(snapshot.error);
+                                  return Text('เกิดข้อผิดผลาด');
+                                }
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.waiting:
+                                    return Text('Loading...');
+                                    break;
+                                  default:
+                                    return ResponsiveGridList(
+                                      desiredItemWidth: 150,
+                                      minSpacing: 10,
+                                      children: snapshot.data.docs.map((doc) {
+                                        Map document = doc.data();
+                                        DateTime date = new DateTime
+                                                .fromMillisecondsSinceEpoch(
+                                            doc['orderDate']);
+                                        return GestureDetector(
+                                          child: Container(
+                                            alignment: Alignment.topCenter,
+                                            decoration: BoxDecoration(
+                                                color: Colors.redAccent[100],
                                                 borderRadius:
                                                     BorderRadius.circular(10)),
                                             child: Stack(
@@ -370,7 +873,7 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                             ),
                                           ),
                                           onTap: () =>
-                                              changeItemStatus(doc, 'PREPARED'),
+                                              changeItemStatus(doc, 'CANCELED'),
                                           onLongPress: () =>
                                               showActionMenu(doc),
                                         );
@@ -380,459 +883,74 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                               },
                             ),
                           ),
-                        ),
-                      )),
-                  Flexible(
-                      flex: 1,
-                      child: Container(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: StreamBuilder<QuerySnapshot>(
-                              stream: dbRef
-                                  .collection('restaurantDB')
-                                  .doc('s1KEI8hv3vt9UveKERtJ')
-                                  .collection('order-items')
-                                  .where('itemStatus', isEqualTo: 'PREPARED')
-                                  .orderBy('orderDate', descending: true)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) {
-                                  print(snapshot.error);
-                                  return Text('เกิดข้อผิดผลาด');
-                                }
-                                switch (snapshot.connectionState) {
-                                  case ConnectionState.waiting:
-                                    return Text('Loading...');
-                                    break;
-                                  default:
-                                    return ResponsiveGridList(
-                                      desiredItemWidth: 150,
-                                      minSpacing: 10,
-                                      children: snapshot.data.docs.map((doc) {
-                                        Map document = doc.data();
-                                        DateTime date = new DateTime
-                                                .fromMillisecondsSinceEpoch(
-                                            doc['orderDate']);
-                                        return GestureDetector(
-                                          child: Container(
-                                            alignment: Alignment.topCenter,
-                                            decoration: BoxDecoration(
-                                                color: Colors.amber,
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
-                                            child: Stack(
-                                              children: [
-                                                Container(
-                                                  height: 120,
-                                                  margin: EdgeInsets.all(10),
-                                                  // decoration: BoxDecoration(color: Colors.white),
-                                                  alignment:
-                                                      Alignment.bottomCenter,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            '${doc['productName']}',
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                          Text(
-                                                            'x${doc['qty']}',
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.pink,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          )
-                                                        ],
-                                                      ),
-                                                      Divider(),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          document.containsKey(
-                                                                  'type')
-                                                              ? Text(
-                                                                  '${document['type']}')
-                                                              : Container(),
-                                                          document.containsKey(
-                                                                  'options')
-                                                              ? Text(
-                                                                  '${document['options']['name']}')
-                                                              : Container(),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      height: 40,
-                                                      width: 80,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      padding: EdgeInsets.only(
-                                                          left: 10, right: 10),
-                                                      decoration: BoxDecoration(
-                                                        color: ThemeColors
-                                                            .kPrimaryColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      child: Text(
-                                                        '${doc['tableName']}',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.orange,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                        '${helper.timestampToTime(date)} น.'),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          onTap: () =>
-                                              changeItemStatus(doc, 'SERVED'),
-                                          onLongPress: () =>
-                                              showActionMenu(doc),
-                                        );
-                                      }).toList(),
-                                    );
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                      ))
-                ],
+                        ))
+                  ],
+                ),
               ),
-            ),
-            Container(
-              child: Row(
-                children: [
-                  Flexible(
-                      flex: 1,
-                      child: Container(
-                        child: Card(
-                          child: StreamBuilder<QuerySnapshot>(
-                            stream: dbRef
-                                .collection('restaurantDB')
-                                .doc('s1KEI8hv3vt9UveKERtJ')
-                                .collection('order-items')
-                                .where('itemStatus', isEqualTo: 'SERVED')
-                                .orderBy('orderDate', descending: true)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                print(snapshot.error);
-                                return Text('เกิดข้อผิดผลาด');
-                              }
-                              switch (snapshot.connectionState) {
-                                case ConnectionState.waiting:
-                                  return Text('Loading...');
-                                  break;
-                                default:
-                                  return ResponsiveGridList(
-                                    desiredItemWidth: 150,
-                                    minSpacing: 10,
-                                    children: snapshot.data.docs.map((doc) {
-                                      Map document = doc.data();
-                                      DateTime date = new DateTime
-                                              .fromMillisecondsSinceEpoch(
-                                          doc['orderDate']);
-                                      return GestureDetector(
-                                        child: Container(
-                                          alignment: Alignment.topCenter,
-                                          decoration: BoxDecoration(
-                                              color: Colors.greenAccent[100],
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Stack(
-                                            children: [
-                                              Container(
-                                                height: 120,
-                                                margin: EdgeInsets.all(10),
-                                                // decoration: BoxDecoration(color: Colors.white),
-                                                alignment:
-                                                    Alignment.bottomCenter,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          '${doc['productName']}',
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                          'x${doc['qty']}',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.pink,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Divider(),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        document.containsKey(
-                                                                'type')
-                                                            ? Text(
-                                                                '${document['type']}')
-                                                            : Container(),
-                                                        document.containsKey(
-                                                                'options')
-                                                            ? Text(
-                                                                '${document['options']['name']}')
-                                                            : Container(),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Container(
-                                                    height: 40,
-                                                    width: 80,
-                                                    alignment: Alignment.center,
-                                                    padding: EdgeInsets.only(
-                                                        left: 10, right: 10),
-                                                    decoration: BoxDecoration(
-                                                      color: ThemeColors
-                                                          .kPrimaryColor,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                    child: Text(
-                                                      '${doc['tableName']}',
-                                                      style: TextStyle(
-                                                          color: Colors.orange,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                      '${helper.timestampToTime(date)} น.'),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        onLongPress: () => showActionMenu(doc),
-                                      );
-                                    }).toList(),
-                                  );
-                              }
-                            },
-                          ),
-                        ),
-                      )),
-                  Flexible(
-                      flex: 1,
-                      child: Container(
-                        child: Card(
-                          child: StreamBuilder<QuerySnapshot>(
-                            stream: dbRef
-                                .collection('restaurantDB')
-                                .doc('s1KEI8hv3vt9UveKERtJ')
-                                .collection('order-items')
-                                .where('itemStatus', isEqualTo: 'CANCELED')
-                                .orderBy('orderDate', descending: true)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                print(snapshot.error);
-                                return Text('เกิดข้อผิดผลาด');
-                              }
-                              switch (snapshot.connectionState) {
-                                case ConnectionState.waiting:
-                                  return Text('Loading...');
-                                  break;
-                                default:
-                                  return ResponsiveGridList(
-                                    desiredItemWidth: 150,
-                                    minSpacing: 10,
-                                    children: snapshot.data.docs.map((doc) {
-                                      Map document = doc.data();
-                                      DateTime date = new DateTime
-                                              .fromMillisecondsSinceEpoch(
-                                          doc['orderDate']);
-                                      return GestureDetector(
-                                        child: Container(
-                                          alignment: Alignment.topCenter,
-                                          decoration: BoxDecoration(
-                                              color: Colors.redAccent[100],
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Stack(
-                                            children: [
-                                              Container(
-                                                height: 120,
-                                                margin: EdgeInsets.all(10),
-                                                // decoration: BoxDecoration(color: Colors.white),
-                                                alignment:
-                                                    Alignment.bottomCenter,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          '${doc['productName']}',
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                          'x${doc['qty']}',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.pink,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Divider(),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        document.containsKey(
-                                                                'type')
-                                                            ? Text(
-                                                                '${document['type']}')
-                                                            : Container(),
-                                                        document.containsKey(
-                                                                'options')
-                                                            ? Text(
-                                                                '${document['options']['name']}')
-                                                            : Container(),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Container(
-                                                    height: 40,
-                                                    width: 80,
-                                                    alignment: Alignment.center,
-                                                    padding: EdgeInsets.only(
-                                                        left: 10, right: 10),
-                                                    decoration: BoxDecoration(
-                                                      color: ThemeColors
-                                                          .kPrimaryColor,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                    child: Text(
-                                                      '${doc['tableName']}',
-                                                      style: TextStyle(
-                                                          color: Colors.orange,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                      '${helper.timestampToTime(date)} น.'),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        onTap: () =>
-                                            changeItemStatus(doc, 'CANCELED'),
-                                        onLongPress: () => showActionMenu(doc),
-                                      );
-                                    }).toList(),
-                                  );
-                              }
-                            },
-                          ),
-                        ),
-                      ))
-                ],
+            ],
+            options: CarouselOptions(
+                scrollDirection: Axis.horizontal,
+                height: 550,
+                aspectRatio: 16 / 9,
+                viewportFraction: 1.0,
+                enableInfiniteScroll: false,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                }),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 1,
+        child: Container(
+          height: 45,
+          margin: EdgeInsets.only(left: 10, right: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('ยกเลิก'),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left:
+                        BorderSide(color: ThemeColors.kCanceledColor, width: 5),
+                  ),
+                ),
               ),
-            ),
-          ],
-          options: CarouselOptions(
-            scrollDirection: Axis.horizontal,
-            height: 600,
-            aspectRatio: 16 / 9,
-            viewportFraction: 1.0,
-            enableInfiniteScroll: false,
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('เสร็จแล้ว'),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(color: ThemeColors.kServedColor, width: 5),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('กำลังปรุง'),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(color: Colors.amber, width: 5),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('สั่งแล้ว'),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(color: Colors.orangeAccent[100], width: 5),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ],
-    ));
+      ),
+    );
   }
 }

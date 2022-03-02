@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/theme.dart';
+import 'package:week_of_year/week_of_year.dart';
 import 'package:flutter_restaurant/widgets/ProductItemBox.dart';
 
 class AddOrderPage extends StatefulWidget {
@@ -45,7 +46,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
         .add({
       "itemStatus": "ORDERING",
       "options": selectedOption,
+      "orderDay" : new DateTime.now().day,
+      "orderWeek" : new DateTime.now().weekOfYear,
+      "orderMonth" : new DateTime.now().month,
       "orderDate": new DateTime.now().millisecondsSinceEpoch,
+      "statusDate": new DateTime.now().millisecondsSinceEpoch,
       "orderId": orderId,
       "price": widget.product['price'],
       "productId": widget.product.id,

@@ -1,9 +1,12 @@
+import 'dart:html';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:d_chart/d_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/theme.dart';
+import 'package:week_of_year/week_of_year.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -28,8 +31,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
   double totalBalanceProduct = 0;
   List<Map<String, dynamic>> results = [];
   List<Map<String, dynamic>> products = [];
-  List<Map<String, dynamic>> resultsY = [];
-  List<Map<String, dynamic>> productsY = [];
+  List<Map<String, dynamic>> weeklyPay = [];
+  List<Map<String, dynamic>> weeklyProduct = [];
+  List<Map<String, dynamic>> monthPay = [];
+  List<Map<String, dynamic>> monthProduct = [];
   List pages = [0, 1];
   // int _currentIndex = 0;
 
@@ -73,6 +78,31 @@ class _AdminDashboardState extends State<AdminDashboard> {
         59,
       ).millisecondsSinceEpoch;
 
+      int weekDate = new DateTime(
+        reportDate.year,
+        reportDate.month,
+        reportDate.day,
+        0,
+        0,
+        0,
+      ).weekOfYear;
+
+      int monthDateStart = new DateTime(
+        reportDate.year,
+        reportDate.month,
+      ).month;
+
+      // int monthDateEnd = new DateTime(
+      //   reportDate.year,
+      //   reportDate.month - 6,
+      // ).month;
+
+      QuerySnapshot qsOrder = await dbRef
+          .collection('restaurantDB')
+          .doc('s1KEI8hv3vt9UveKERtJ')
+          .collection('orders')
+          .get();
+
       QuerySnapshot qsTable = await dbRef
           .collection('restaurantDB')
           .doc('s1KEI8hv3vt9UveKERtJ')
@@ -88,6 +118,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           .where('orderDate', isLessThanOrEqualTo: endDate)
           .where('orderDate', isGreaterThanOrEqualTo: startDate)
           .get();
+
       // yestesday
       QuerySnapshot qsY = await dbRef
           .collection('restaurantDB')
@@ -123,15 +154,146 @@ class _AdminDashboardState extends State<AdminDashboard> {
           .where('orderDate', isGreaterThanOrEqualTo: startDateY)
           .get();
 
+      // weeeky
+      QuerySnapshot pw = await dbRef
+          .collection('restaurantDB')
+          .doc('s1KEI8hv3vt9UveKERtJ')
+          .collection('order-items')
+          .where('itemStatus', isEqualTo: 'SERVED')
+          .where('orderWeek', isEqualTo: weekDate)
+          .orderBy('orderDay', descending: true)
+          .get();
+
+      // month
+      QuerySnapshot pm = await dbRef
+          .collection('restaurantDB')
+          .doc('s1KEI8hv3vt9UveKERtJ')
+          .collection('order-items')
+          .where('itemStatus', isEqualTo: 'SERVED')
+          .where('orderMonth', isLessThanOrEqualTo: monthDateStart)
+          .get();
+
       double _totalPrice = 0;
       double _totalProduct = 0;
       double _totalPriceY = 0;
       double _totalProductY = 0;
+      double _totalPriceW = 0;
+      double _totalProductW = 0;
 
       List<Map<String, dynamic>> _results = [];
       List<Map<String, dynamic>> _products = [];
-      List<Map<String, dynamic>> _resultsY = [];
-      List<Map<String, dynamic>> _productsY = [];
+      List<Map<String, dynamic>> _weeklyPay = [];
+      List<Map<String, dynamic>> _weeklyProduct = [];
+      List<Map<String, dynamic>> _monthPay = [];
+      List<Map<String, dynamic>> _monthProduct = [];
+
+      qsOrder.docs.forEach((e) {
+        Map<String, dynamic> weekly = new Map();
+        double _weekPayment = 0;
+        double _weekDay = 0;
+        String _weekDetail = "";
+
+        pw.docs.forEach((i) {
+          Map<String, dynamic> data = i.data();
+          if (e['orderWeek'] == i['orderWeek']) {
+            if (e['orderDay'] == i['orderDay']) {
+              double qtyPrice = i['price'] * i['qty'];
+              if (data.containsKey('options')) {
+              double optionsPrice =
+                  i['options']['price'] * i['qty'];
+              qtyPrice += optionsPrice;
+            }
+
+              _weekPayment += qtyPrice;
+              _weekDay = i['orderDay'];
+              _weekDetail = "วันที่ $_weekDay";
+            }
+          }
+
+          weekly['day'] = _weekDetail;
+          weekly['total'] = _weekPayment;
+        });
+
+        print(weekly);
+
+        _weeklyPay.add(weekly);
+      });
+
+      //
+      qsOrder.docs.forEach((e) {
+        Map<String, dynamic> weeklyProduct = new Map();
+        double _qtyProducts = 0;
+        double _weeklyProducts = 0;
+        String _weeklyDetail = "";
+
+        pw.docs.forEach((i) {
+          if (i['orderWeek'] == e['orderWeek']) {
+            if (i['orderDay'] == e['orderDay']) {
+              double qtyProduct = i['qty'];
+
+              _qtyProducts += qtyProduct;
+              _weeklyProducts = i['orderDay'];
+              _weeklyDetail = "วันที่ $_weeklyProducts";
+            }
+          }
+
+          weeklyProduct['day'] = _weeklyDetail;
+          weeklyProduct['total'] = _qtyProducts;
+        });
+
+        _weeklyProduct.add(weeklyProduct);
+      });
+
+      qsOrder.docs.forEach((e) {
+        Map<String, dynamic> product = new Map();
+        double _monthPayment = 0;
+        String _monthDetail = "";
+        double totalPricetableMonth = 0;
+
+        pm.docs.forEach((document) {
+          Map<String, dynamic> data = document.data();
+          if (document['orderMonth'] == e['orderMonth']) {
+            double qtyPrice = document['qty'] * document['price'];
+            if (data.containsKey('options')) {
+              double optionsPrice =
+                  document['options']['price'] * document['qty'];
+              qtyPrice += optionsPrice;
+            }
+
+            totalPricetableMonth += qtyPrice;
+
+            _monthPayment = document['orderMonth'];
+            _monthDetail = "เดือนที่ $_monthPayment";
+          }
+
+          product['month'] = _monthDetail;
+          product['total'] = totalPricetableMonth;
+        });
+
+        _monthPay.add(product);
+      });
+
+      qsOrder.docs.forEach((e) {
+        Map<String, dynamic> product = new Map();
+        double _qtyProducts = 0;
+        double _monthProducts = 0;
+        String _monthDetail = "";
+
+        pm.docs.forEach((item) {
+          if (item['orderMonth'] == e['orderMonth']) {
+            double qtyProduct = item['qty'];
+
+            _qtyProducts += qtyProduct;
+            _monthProducts = item['orderMonth'];
+            _monthDetail = "เดือนที่ $_monthProducts";
+          }
+
+          product['month'] = _monthDetail;
+          product['total'] = _qtyProducts;
+        });
+
+        _monthProduct.add(product);
+      });
 
       // today
       p.docs.forEach((tDocument) {
@@ -168,9 +330,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
       // today
       qsTable.docs.forEach((tDocument) {
         Map<String, dynamic> table = new Map();
-        table['tableName'] = tDocument['tableName'];
-        double totalPricetable = 0;
-        double totalPricetableY = 0;
+        double _totalPricetable = 0;
+        double _totalPricetableY = 0;
 
         qs.docs.forEach((document) {
           Map<String, dynamic> data = document.data();
@@ -183,7 +344,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               qtyPrice += optionsPrice;
             }
 
-            totalPricetable += qtyPrice;
+            _totalPricetable += qtyPrice;
 
             _totalPrice += qtyPrice;
           }
@@ -200,23 +361,26 @@ class _AdminDashboardState extends State<AdminDashboard> {
               qtyPrice += optionsPrice;
             }
 
-            totalPricetableY += qtyPrice;
+            _totalPricetableY += qtyPrice;
 
             _totalPriceY += qtyPrice;
           }
         });
 
-        table['total'] = totalPricetable;
-        table['totalY'] = totalPricetableY;
-        table['balance'] = totalPriceY - totalPricetable;
+        table['total'] = _totalPricetable;
+        table['totalY'] = _totalPricetableY;
+        table['balance'] = _totalPrice - _totalPriceY;
+        table['tableName'] = tDocument['tableName'];
         _results.add(table);
       });
 
       setState(() {
         results = _results;
-        resultsY = _resultsY;
         products = _products;
-        productsY = _productsY;
+        weeklyPay = _weeklyPay;
+        weeklyProduct = _weeklyProduct;
+        monthPay = _monthPay;
+        monthProduct = _monthProduct;
         totalProduct = _totalProduct;
         totalProductY = _totalProductY;
         totalPrice = _totalPrice;
@@ -228,14 +392,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       print(error);
     }
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   if (mounted) {
-  //     getOrderItemsRealTime();
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -307,116 +463,207 @@ class _AdminDashboardState extends State<AdminDashboard> {
         CarouselSlider(
           items: [
             Container(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, bottom: 10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Container(
-                          constraints:
-                              BoxConstraints.tightFor(height: 125, width: 200),
-                          decoration: BoxDecoration(
-                              color: ThemeColors.kPrimaryColor,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'วันนี้',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  '${helper.formatNumber(totalPrice, 0)}',
-                                  style: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange),
-                                ),
-                                Text(
-                                  'บาท',
-                                  style: TextStyle(color: Colors.white),
-                                )
-                              ],
-                            ),
+                child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        constraints:
+                            BoxConstraints.tightFor(height: 125, width: 200),
+                        decoration: BoxDecoration(
+                            color: ThemeColors.kPrimaryColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'วันนี้',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                '${helper.formatNumber(totalPrice, 0)}',
+                                style: TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange),
+                              ),
+                              Text(
+                                'บาท',
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
                           ),
                         ),
-                        Container(
-                          constraints:
-                              BoxConstraints.tightFor(height: 125, width: 200),
-                          decoration: BoxDecoration(
-                              color: ThemeColors.kPrimaryColor,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'เมื่อวาน',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  '${helper.formatNumber(totalPrice, 0)}',
-                                  style: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange),
-                                ),
-                                Text(
-                                  'บาท',
-                                  style: TextStyle(color: Colors.white),
-                                )
-                              ],
-                            ),
+                      ),
+                      Container(
+                        constraints:
+                            BoxConstraints.tightFor(height: 125, width: 200),
+                        decoration: BoxDecoration(
+                            color: ThemeColors.kPrimaryColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'เมื่อวาน',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                '${helper.formatNumber(totalPriceY, 0)}',
+                                style: TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange),
+                              ),
+                              Text(
+                                'บาท',
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
                           ),
                         ),
-                        Container(
-                          constraints:
-                              BoxConstraints.tightFor(height: 125, width: 200),
-                          decoration: BoxDecoration(
-                              color: ThemeColors.kPrimaryColor,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'คงเหลือ',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                Text(
-                                  '${helper.formatNumber(totalBalance, 0)}',
-                                  style: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange),
-                                ),
-                                Text(
-                                  'บาท',
-                                  style: TextStyle(color: Colors.white),
-                                )
-                              ],
-                            ),
+                      ),
+                      Container(
+                        constraints:
+                            BoxConstraints.tightFor(height: 125, width: 200),
+                        decoration: BoxDecoration(
+                            color: ThemeColors.kPrimaryColor,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Center(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'ส่วนต่าง',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                '${helper.formatNumber(totalBalance, 0)}',
+                                style: TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange),
+                              ),
+                              Text(
+                                'บาท',
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    width: 1000,
-                    height: 400,
-                    child: Card(
+                ),
+                Row(
+                  children: [
+                    Flexible(
+                      flex: 1,
                       child: Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(5),
+                        child: SizedBox(
+                          width: 1000,
+                          height: 200,
+                          child: Card(
+                            child: Container(
+                              child: AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: DChartBar(
+                                  showBarValue: true,
+                                  data: [
+                                    {
+                                      'id': 'Bar1',
+                                      'data': results.map((e) {
+                                        return {
+                                          'domain': e['tableName'],
+                                          'measure': e['total']
+                                        };
+                                      }).toList()
+                                    },
+                                    {
+                                      'id': 'Bar2',
+                                      'data': results.map((e) {
+                                        return {
+                                          'domain': e['tableName'],
+                                          'measure': e['totalY']
+                                        };
+                                      }).toList()
+                                    }
+                                  ],
+                                  yAxisTitle: "จำนวนเงิน / บาท",
+                                  barValueColor: Colors.white,
+                                  barColor: (item, index, id) => id == 'Bar1'
+                                      ? Colors.amber
+                                      : ThemeColors.kPrimaryColor,
+                                  barValue: (item, index) =>
+                                      item['measure'].toString(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: SizedBox(
+                          width: 1000,
+                          height: 200,
+                          child: Card(
+                            child: Container(
+                              child: AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: DChartBar(
+                                  showBarValue: true,
+                                  data: [
+                                    {
+                                      'id': 'Bar1',
+                                      'data': weeklyPay.map((e) {
+                                        return {
+                                          'domain': e['day'],
+                                          'measure': e['total']
+                                        };
+                                      }).toList()
+                                    },
+                                  ],
+                                  yAxisTitle: "จำนวนเงิน / บาท",
+                                  barValueColor: Colors.white,
+                                  barColor: (item, index, id) => id == 'Bar1'
+                                      ? Colors.amber
+                                      : ThemeColors.kPrimaryColor,
+                                  barValue: (item, index) =>
+                                      item['measure'].toString(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: SizedBox(
+                      width: 1300,
+                      height: 500,
+                      child: Card(
                         child: Container(
                           child: AspectRatio(
                             aspectRatio: 16 / 9,
@@ -425,23 +672,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               data: [
                                 {
                                   'id': 'Bar1',
-                                  'data': results.map((e) {
+                                  'data': monthPay.map((e) {
                                     return {
-                                      'domain': e['tableName'],
+                                      'domain': e['month'],
                                       'measure': e['total']
                                     };
                                   }).toList()
                                 },
-                                {
-                                  'id': 'Bar2',
-                                  'data': results.map((e) {
-                                    return {
-                                      'domain': e['tableName'],
-                                      'measure': e['totalY']
-                                    };
-                                  }).toList()
-                                }
                               ],
+                              yAxisTitle: "จำนวนเงิน / บาท",
                               barValueColor: Colors.white,
                               barColor: (item, index, id) => id == 'Bar1'
                                   ? Colors.amber
@@ -454,9 +693,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
+                ),
+              ],
+            )),
             Container(
               child: Column(
                 children: [
@@ -541,7 +780,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'คงเหลือ',
+                                  'ส่วนต่าง',
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Text(
@@ -562,43 +801,127 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 1000,
-                    height: 400,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Container(
-                          child: AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: DChartBar(
-                              showBarValue: true,
-                              data: [
-                                {
-                                  'id': 'Bar1',
-                                  'data': products.map((e) {
-                                    return {
-                                      'domain': e['productName'],
-                                      'measure': e['total']
-                                    };
-                                  }).toList()
-                                },
-                                {
-                                  'id': 'Bar2',
-                                  'data': products.map((e) {
-                                    return {
-                                      'domain': e['productName'],
-                                      'measure': e['totalY']
-                                    };
-                                  }).toList()
-                                }
-                              ],
-                              barValueColor: Colors.white,
-                              barColor: (item, index, id) => id == 'Bar1'
-                                  ? Colors.amber
-                                  : ThemeColors.kPrimaryColor,
-                              barValue: (item, index) =>
-                                  item['measure'].toString(),
+                  Row(
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: SizedBox(
+                            width: 1000,
+                            height: 200,
+                            child: Card(
+                              child: Container(
+                                child: AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: DChartBar(
+                                    showBarValue: true,
+                                    data: [
+                                      {
+                                        'id': 'Bar1',
+                                        'data': products.map((e) {
+                                          return {
+                                            'domain': e['productName'],
+                                            'measure': e['total']
+                                          };
+                                        }).toList()
+                                      },
+                                      {
+                                        'id': 'Bar2',
+                                        'data': products.map((e) {
+                                          return {
+                                            'domain': e['productName'],
+                                            'measure': e['totalY']
+                                          };
+                                        }).toList()
+                                      }
+                                    ],
+                                    yAxisTitle: "จำนวนเงิน / บาท",
+                                    barValueColor: Colors.white,
+                                    barColor: (item, index, id) => id == 'Bar1'
+                                        ? Colors.amber
+                                        : ThemeColors.kPrimaryColor,
+                                    barValue: (item, index) =>
+                                        item['measure'].toString(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: SizedBox(
+                            width: 1000,
+                            height: 200,
+                            child: Card(
+                              child: Container(
+                                child: AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: DChartBar(
+                                    showBarValue: true,
+                                    data: [
+                                      {
+                                        'id': 'Bar1',
+                                        'data': weeklyProduct.map((e) {
+                                          return {
+                                            'domain': e['day'],
+                                            'measure': e['total']
+                                          };
+                                        }).toList()
+                                      },
+                                    ],
+                                    yAxisTitle: "จำนวนเงิน / บาท",
+                                    barValueColor: Colors.white,
+                                    barColor: (item, index, id) => id == 'Bar1'
+                                        ? Colors.amber
+                                        : ThemeColors.kPrimaryColor,
+                                    barValue: (item, index) =>
+                                        item['measure'].toString(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Flexible(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: SizedBox(
+                        width: 1300,
+                        height: 500,
+                        child: Card(
+                          child: Container(
+                            child: AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: DChartBar(
+                                showBarValue: true,
+                                data: [
+                                  {
+                                    'id': 'Bar1',
+                                    'data': monthProduct.map((e) {
+                                      return {
+                                        'domain': e['month'],
+                                        'measure': e['total']
+                                      };
+                                    }).toList()
+                                  },
+                                ],
+                                yAxisTitle: "จำนวนเงิน / บาท",
+                                barValueColor: Colors.white,
+                                barColor: (item, index, id) => id == 'Bar1'
+                                    ? Colors.amber
+                                    : ThemeColors.kPrimaryColor,
+                                barValue: (item, index) =>
+                                    item['measure'].toString(),
+                              ),
                             ),
                           ),
                         ),

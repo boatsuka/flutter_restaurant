@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate
       ],
+      locale: Locale('th', 'TH'),
       supportedLocales: [Locale('th', 'TH')],
     );
   }

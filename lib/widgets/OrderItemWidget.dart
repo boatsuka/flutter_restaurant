@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_restaurant/theme.dart';
+import 'package:intl/intl.dart';
 
 class OrderItemWidget extends StatelessWidget {
   final DocumentSnapshot document;
@@ -11,6 +12,8 @@ class OrderItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Map data = this.document.data();
 
+    final f = new DateFormat('yyyy-MM-dd hh:mm:ss a', 'th-TH');
+    int timeUpdate = this.document['statusDate'];
     double totalPrice = this.document['qty'] * this.document['price'];
 
     if (data.containsKey('options')) {
@@ -92,16 +95,15 @@ class OrderItemWidget extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                  color: 
-                      this.document['itemStatus'] == 'ORDERING'
+                  color: this.document['itemStatus'] == 'ORDERING'
                       ? ThemeColors.kAccentColor
                       : this.document['itemStatus'] == 'PREPARED'
                           ? ThemeColors.kPrepareColor
                           : this.document['itemStatus'] == 'SERVED'
-                            ? ThemeColors.kServedColor
-                            : ThemeColors.kCanceledColor,
+                              ? ThemeColors.kServedColor
+                              : ThemeColors.kCanceledColor,
                   width: 85,
-                  height: 130,
+                  height: 160,
                   child: this.document['itemStatus'] == 'ORDERING'
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -112,10 +114,12 @@ class OrderItemWidget extends StatelessWidget {
                               color: Colors.white,
                               size: 40,
                             ),
-                            Text('สั่งแล้ว',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),)
+                            Text(
+                              'สั่งแล้ว',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            )
                           ],
                         )
                       : this.document['itemStatus'] == 'PREPARED'
@@ -215,6 +219,14 @@ class OrderItemWidget extends StatelessWidget {
                               )
                             : Container(),
                       ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Chip(
+                        label: Text(
+                            "อัพเดทเมื่อ ${f.format(new DateTime.fromMillisecondsSinceEpoch(timeUpdate))}"),
+                        backgroundColor: Color(0xffe5eaf8),
+                      ),
                     ),
                   ],
                 ),

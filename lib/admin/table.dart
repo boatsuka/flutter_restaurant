@@ -6,6 +6,7 @@ import 'package:flutter_restaurant/admin/orderItem.dart';
 import 'package:flutter_restaurant/showQRCode.dart';
 import 'package:flutter_restaurant/theme.dart';
 import 'package:responsive_grid/responsive_grid.dart';
+import 'package:week_of_year/week_of_year.dart';
 
 class AdminTablePage extends StatefulWidget {
   @override
@@ -33,6 +34,9 @@ class _AdminTablePageState extends State<AdminTablePage> {
         .add({
       "orderStatus": "OPEN",
       "tableId": document.id,
+      "orderDay" : new DateTime.now().day,
+      "orderWeek" : new DateTime.now().weekOfYear,
+      "orderMonth" : new DateTime.now().month,
       "orderDate": new DateTime.now().millisecondsSinceEpoch
     });
 
