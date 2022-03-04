@@ -227,18 +227,21 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
         });
   }
 
-  checkOrderID() async {
-    await dbRef
-        .collection('restaurantDB')
-        .doc('s1KEI8hv3vt9UveKERtJ')
-        .collection('orders')
-        .where('orderStatus', isEqualTo: 'OPEN')
-        .get()
-        .then((value) {
-      value.docs.forEach((e) {
-        orders.add(e.id);
+  Future checkOrderID() async {
+    try {
+      QuerySnapshot qsOrder = await dbRef
+          .collection('restaurantDB')
+          .doc('s1KEI8hv3vt9UveKERtJ')
+          .collection('orders')
+          .where('orderStatus', isEqualTo: 'CLOSED')
+          .get();
+
+      qsOrder.docs.forEach((item) {
+        orders.add(item.id);
       });
-    });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override

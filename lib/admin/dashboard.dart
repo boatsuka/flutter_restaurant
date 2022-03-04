@@ -92,11 +92,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         reportDate.month,
       ).month;
 
-      // int monthDateEnd = new DateTime(
-      //   reportDate.year,
-      //   reportDate.month - 6,
-      // ).month;
-
       QuerySnapshot qsOrder = await dbRef
           .collection('restaurantDB')
           .doc('s1KEI8hv3vt9UveKERtJ')
@@ -177,8 +172,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       double _totalProduct = 0;
       double _totalPriceY = 0;
       double _totalProductY = 0;
-      double _totalPriceW = 0;
-      double _totalProductW = 0;
 
       List<Map<String, dynamic>> _results = [];
       List<Map<String, dynamic>> _products = [];
@@ -213,8 +206,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
           weekly['day'] = _weekDetail;
           weekly['total'] = _weekPayment;
         });
-
-        print(weekly);
 
         _weeklyPay.add(weekly);
       });
