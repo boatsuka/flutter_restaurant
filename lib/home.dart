@@ -149,7 +149,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Center(
           child: Text(
-            'Kmitl Food',
+            'SRMS',
             style: TextStyle(color: ThemeColors.kPrimaryColor),
           ),
         ),
