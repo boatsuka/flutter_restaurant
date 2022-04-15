@@ -227,27 +227,9 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
         });
   }
 
-  Future checkOrderID() async {
-    try {
-      QuerySnapshot qsOrder = await dbRef
-          .collection('restaurantDB')
-          .doc('s1KEI8hv3vt9UveKERtJ')
-          .collection('orders')
-          .where('orderStatus', isEqualTo: 'CLOSED')
-          .get();
-
-      qsOrder.docs.forEach((item) {
-        orders.add(item.id);
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    checkOrderID();
   }
 
   @override
@@ -316,8 +298,7 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                             child: Container(
                                               alignment: Alignment.topCenter,
                                               decoration: BoxDecoration(
-                                                  color:
-                                                      Colors.orangeAccent[100],
+                                                  color: Colors.blueAccent,
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           10)),
@@ -409,7 +390,7 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                                           '${doc['tableName']}',
                                                           style: TextStyle(
                                                               color:
-                                                                  Colors.orange,
+                                                                  ThemeColors.kAccentColor,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold),
@@ -422,8 +403,8 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                                 ],
                                               ),
                                             ),
-                                            onTap: () => changeItemStatus(
-                                                doc, 'PREPARED'),
+                                            onTap: () =>
+                                                changeItemStatus(doc, 'SERVED'),
                                             onLongPress: () =>
                                                 showActionMenu(doc),
                                           );
@@ -563,7 +544,7 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                                           '${doc['tableName']}',
                                                           style: TextStyle(
                                                               color:
-                                                                  Colors.orange,
+                                                                  ThemeColors.kAccentColor,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold),
@@ -717,7 +698,7 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                                         '${doc['tableName']}',
                                                         style: TextStyle(
                                                             color:
-                                                                Colors.orange,
+                                                                ThemeColors.kAccentColor,
                                                             fontWeight:
                                                                 FontWeight
                                                                     .bold),
@@ -862,7 +843,7 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                                         '${doc['tableName']}',
                                                         style: TextStyle(
                                                             color:
-                                                                Colors.orange,
+                                                                ThemeColors.kAccentColor,
                                                             fontWeight:
                                                                 FontWeight
                                                                     .bold),
@@ -912,23 +893,13 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
           margin: EdgeInsets.only(left: 10, right: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+            children: [  
               Container(
                 padding: EdgeInsets.only(left: 10),
-                child: Text('ยกเลิก'),
+                child: Text('สั่งแล้ว'),
                 decoration: BoxDecoration(
                   border: Border(
-                    left:
-                        BorderSide(color: ThemeColors.kCanceledColor, width: 5),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Text('เสร็จแล้ว'),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(color: ThemeColors.kServedColor, width: 5),
+                    left: BorderSide(color: Colors.blue, width: 5),
                   ),
                 ),
               ),
@@ -943,10 +914,20 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
               ),
               Container(
                 padding: EdgeInsets.only(left: 10),
-                child: Text('สั่งแล้ว'),
+                child: Text('เสร็จแล้ว'),
                 decoration: BoxDecoration(
                   border: Border(
-                    left: BorderSide(color: Colors.orangeAccent[100], width: 5),
+                    left: BorderSide(color: ThemeColors.kServedColor, width: 5),
+                  ),
+                ),
+              ),
+               Container(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('ยกเลิก'),
+                decoration: BoxDecoration(
+                  border: Border(
+                    left:
+                        BorderSide(color: ThemeColors.kCanceledColor, width: 5),
                   ),
                 ),
               ),

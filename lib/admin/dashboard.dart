@@ -192,10 +192,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             if (e['orderDay'] == i['orderDay']) {
               double qtyPrice = i['price'] * i['qty'];
               if (data.containsKey('options')) {
-              double optionsPrice =
-                  i['options']['price'] * i['qty'];
-              qtyPrice += optionsPrice;
-            }
+                double optionsPrice = i['options']['price'] * i['qty'];
+                qtyPrice += optionsPrice;
+              }
 
               _weekPayment += qtyPrice;
               _weekDay = i['orderDay'];
@@ -593,7 +592,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                       }).toList()
                                     }
                                   ],
-                                  yAxisTitle: "จำนวนเงิน / บาท",
+                                  yAxisTitle: "บาท",
                                   barValueColor: Colors.white,
                                   barColor: (item, index, id) => id == 'Bar1'
                                       ? Colors.amber
@@ -631,10 +630,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                       }).toList()
                                     },
                                   ],
-                                  yAxisTitle: "จำนวนเงิน / บาท",
+                                  yAxisTitle: "บาท",
                                   barValueColor: Colors.white,
                                   barColor: (item, index, id) => id == 'Bar1'
-                                      ? Colors.amber
+                                      ? Colors.orangeAccent
                                       : ThemeColors.kPrimaryColor,
                                   barValue: (item, index) =>
                                       item['measure'].toString(),
@@ -671,10 +670,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   }).toList()
                                 },
                               ],
-                              yAxisTitle: "จำนวนเงิน / บาท",
+                              yAxisTitle: "บาท",
                               barValueColor: Colors.white,
                               barColor: (item, index, id) => id == 'Bar1'
-                                  ? Colors.amber
+                                  ? Colors.grey
                                   : ThemeColors.kPrimaryColor,
                               barValue: (item, index) =>
                                   item['measure'].toString(),
@@ -865,10 +864,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                         }).toList()
                                       },
                                     ],
-                                    yAxisTitle: "จำนวนเงิน / บาท",
+                                    yAxisTitle: "เมนู",
                                     barValueColor: Colors.white,
                                     barColor: (item, index, id) => id == 'Bar1'
-                                        ? Colors.amber
+                                        ? Colors.orangeAccent
                                         : ThemeColors.kPrimaryColor,
                                     barValue: (item, index) =>
                                         item['measure'].toString(),
@@ -905,10 +904,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     }).toList()
                                   },
                                 ],
-                                yAxisTitle: "จำนวนเงิน / บาท",
+                                yAxisTitle: "เมนู",
                                 barValueColor: Colors.white,
                                 barColor: (item, index, id) => id == 'Bar1'
-                                    ? Colors.amber
+                                    ? Colors.grey
                                     : ThemeColors.kPrimaryColor,
                                 barValue: (item, index) =>
                                     item['measure'].toString(),
