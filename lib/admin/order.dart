@@ -404,7 +404,7 @@ class _AdminOrderPageState extends State<AdminOrderPage> {
                                               ),
                                             ),
                                             onTap: () =>
-                                                changeItemStatus(doc, 'SERVED'),
+                                                changeItemStatus(doc, 'PREPARED'),
                                             onLongPress: () =>
                                                 showActionMenu(doc),
                                           );
