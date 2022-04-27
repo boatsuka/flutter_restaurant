@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/theme.dart';
@@ -62,6 +63,13 @@ class _AddOrderPageState extends State<AddOrderPage> {
     });
 
     Navigator.of(context).pop(true);
+    Fluttertoast.showToast(
+          msg: "ยืนยันการสั่งซื้อแล้ว",
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "#00b09b",
+          textColor: Colors.white,
+          fontSize: 16);
   }
 
   initData() {

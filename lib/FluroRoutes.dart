@@ -10,6 +10,7 @@ import 'package:flutter_restaurant/admin/settings/table.dart';
 import 'package:flutter_restaurant/home.dart';
 import 'package:flutter_restaurant/login.dart';
 import 'package:flutter_restaurant/notFound.dart';
+import 'package:flutter_restaurant/table.dart';
 
 class FloruRoutes {
   static final FluroRouter router = FluroRouter();
@@ -67,8 +68,14 @@ class FloruRoutes {
     return LoginPage();
   });
 
+  static Handler tableHandler =
+      Handler(handlerFunc: (BuildContext context, Map<String, dynamic> params) {
+    return TablePage();
+  });
+
   static void defineRoutes() {
     router.define('/', handler: defaultHandler);
+    router.define('/table', handler: tableHandler);
     router.define('/admin', handler: adminHandler);
     router.define('/admin/products', handler: adminSettingProductsHandler);
     router.define('/admin/add/product', handler: adminSettingAddProductHandler);

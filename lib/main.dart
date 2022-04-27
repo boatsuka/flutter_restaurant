@@ -22,14 +22,15 @@ class MyApp extends StatelessWidget {
             .copyWith(secondary: ThemeColors.kAccentColor),
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/table',
       onGenerateRoute: FloruRoutes.router.generator,
       builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
           child: child),
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       locale: Locale('th', 'TH'),
       supportedLocales: [Locale('th', 'TH')],

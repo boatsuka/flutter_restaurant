@@ -1,7 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_restaurant/helper.dart';
 import 'package:flutter_restaurant/login.dart';
 import 'package:flutter_restaurant/theme.dart';
@@ -77,6 +77,13 @@ class _HomePageState extends State<HomePage> {
           "message": "เรียกพนักงาน",
           "time": new DateTime.now().millisecondsSinceEpoch,
         });
+        Fluttertoast.showToast(
+            msg: "เรียกพนักงาน",
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            webBgColor: "#00b09b",
+            textColor: Colors.white,
+            fontSize: 16);
       } else {
         await dbRef
             .collection('restaurantDB')
@@ -90,9 +97,22 @@ class _HomePageState extends State<HomePage> {
           "tableName": tableName,
           "orderId": orderId
         });
+        Fluttertoast.showToast(
+            msg: "เรียกพนักงาน",
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            webBgColor: "#00b09b",
+            textColor: Colors.white,
+            fontSize: 16);
       }
     } catch (e) {
-      print(e);
+      Fluttertoast.showToast(
+          msg: "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "#F75151",
+          textColor: Colors.white,
+          fontSize: 16);
     }
   }
 
@@ -110,7 +130,15 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         totalItems = snapshot.docs.length;
       });
-    } catch (e) {}
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "ยืนยันการสั่งซื้อแล้ว",
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          webBgColor: "#00b09b",
+          textColor: Colors.white,
+          fontSize: 16);
+    }
   }
 
   @override
