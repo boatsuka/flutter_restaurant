@@ -257,7 +257,16 @@ class _PaymentPageState extends State<PaymentPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
+              ElevatedButton(
+                  child: Text('เรียกพนักงานเก็บเงิน'),
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      primary: ThemeColors.kPrimaryColor,
+                      minimumSize: Size(150, 50)),
+                  onPressed: () => callEmployee()),
+                  Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('รวมเป็นเงิน'),
@@ -267,15 +276,6 @@ class _PaymentPageState extends State<PaymentPage> {
                   ),
                 ],
               ),
-              ElevatedButton(
-                  child: Text('เรียกพนักงานเก็บเงิน'),
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      primary: ThemeColors.kPrimaryColor,
-                      minimumSize: Size(150, 50)),
-                  onPressed: () => callEmployee())
             ],
           ),
         ),
